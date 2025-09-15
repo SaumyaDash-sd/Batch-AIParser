@@ -1,1 +1,3 @@
-id, user_id, job_title, file_name, job_type, status, created_at, updated_at, deleted_at
+id,user_id,job_title,file_name,job_type,status,total_rows_processed,model,avg_input_token,avg_completion_token,avg_total_token,avg_cost_per_row,created_at,updated_at,deleted_at
+547b5348-bf9a-4dbd-8368-2216d5bbfa7c,6b928164-58f6-418f-91f0-6f7529ba6823,my-first-test-job,sample-file-10-rows.csv,test-job,completed,10,gpt-4o-mini,147.4,23.2,170.6,3.603e-05,2025-09-15T22:12:50.049544,2025-09-15T22:12:50.049567,
+2c413206-c92f-49aa-a554-031739bf4958,6b928164-58f6-418f-91f0-6f7529ba6823,my-second-test-job,sample-file-10-rows.csv,test-job,completed,5,gpt-4o-mini,146.6,23.0,169.6,3.578999999999999e-05,2025-09-15T22:16:25.156510,2025-09-15T22:16:25.156526,

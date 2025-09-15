@@ -54,7 +54,7 @@ async def test_prompt(
         else:
             response.status_code = 400
             raise HTTPException(status_code=400, detail="Unsupported file type")
-        result = test_prompt_process(df, description_json)
+        result = test_prompt_process(user_id, file.filename, df, description_json)
         response.status_code = 200
         return result
 

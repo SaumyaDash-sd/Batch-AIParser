@@ -9,5 +9,3 @@ def read_users():
 
 def write_users(df):
     df.to_csv(USERS_CSV, index=False)
-
-
