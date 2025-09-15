@@ -1,0 +1,2 @@
+id,first_name,last_name,email,password,role,status,access_token,created_at,updated_at,deleted_at
+6b928164-58f6-418f-91f0-6f7529ba6823,Saumya,Dash,saumya@gmail.com,abcd,admin,active,123c6543-e70d-4849-968d-35a458b852ec,2025-09-01 10:00:00,2025-09-01 10:00:00,
