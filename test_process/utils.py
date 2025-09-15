@@ -19,9 +19,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# NO MORE GLOBAL VARIABLES for output
-# output_list = []
-# output_lock = threading.Lock()
 
 def genai_keyword_category_mapping(
     row,
@@ -30,27 +27,28 @@ def genai_keyword_category_mapping(
     placeholder_field,
     unique_id_column,
     output_field,
-    chunk_size,
     credentials,
 ):
     """
-    Processes a single row and RETURNS a result dictionary.
+    Processes a single row.
+    - NEW: Includes comprehensive try-except block to catch any error during a row's processing.
+    - On error, it returns the original row data with an 'error' column.
+    - On success, it returns the original data plus the AI-generated output.
     """
-
-    # ---- Step 1: Fill placeholders dynamically ----
-    prompt_filled = prompt
-    placeholders = re.findall(r"\{\{(.*?)\}\}", prompt)
-
-    for placeholder in placeholders:
-        column_name = placeholder_field.get(placeholder)
-        if column_name and column_name in row:
-            value = str(row[column_name])
-        else:
-            value = f"<MISSING_{placeholder}>"
-        prompt_filled = prompt_filled.replace(f"{{{{{placeholder}}}}}", value)
-
-    # ---- Step 2: Call GPT ----
     try:
+        # ---- Step 1: Fill placeholders dynamically ----
+        prompt_filled = prompt
+        placeholders = re.findall(r"\{\{(.*?)\}\}", prompt)
+
+        for placeholder in placeholders:
+            column_name = placeholder_field.get(placeholder)
+            if column_name and column_name in row and pd.notna(row[column_name]):
+                value = str(row[column_name])
+            else:
+                value = f"<MISSING_{placeholder}>"
+            prompt_filled = prompt_filled.replace(f"{{{{{placeholder}}}}}", value)
+
+        # ---- Step 2: Call GPT ----
         gpt_response, usage = call_gpt_llm_client(
             prompt_filled,
             credentials,
@@ -58,33 +56,44 @@ def genai_keyword_category_mapping(
             temperature=credentials.get("temperature", 0.7),
         )
         handled_output = handling_gpt_output(gpt_response)
-        prompt_usage = usage.prompt_tokens if usage else "N/A"
-        completion_usage = usage.completion_tokens if usage else "N/A"
-        token_usage = usage.total_tokens if usage else "N/A"
+
+        # Prepare successful result
+        result = row.to_dict()
+        result[unique_id_column] = row[unique_id_column]
+
+        # ---- Step 3: Map output to new dataframe columns ----
+        for new_col, gpt_key in handled_output.items():
+            result[new_col] = gpt_key
+        # for new_col in output_field.values():
+        #     # Get the corresponding key from the handled_output, default to None if not found
+        #     result[new_col] = handled_output.get(new_col, None)
+
+
+        # Add token usage and error column (as None for success)
+        result["total_tokens"] = usage.total_tokens if usage else None
+        result["input_tokens"] = usage.prompt_tokens if usage else None
+        result["completion_tokens"] = usage.completion_tokens if usage else None
+        result["error"] = None  # No error on success
+
     except Exception as err:
-        logging.exception(f"Error in GPT processing: {err}")
-        handled_output, token_usage = {"error": str(err)}, "N/A"
+        logging.error(
+            f"Error processing row with ID '{row.get(unique_id_column, 'N/A')}': {err}"
+        )
 
-    # ---- Step 3: Map output to new dataframe columns ----
-    result = row.to_dict()
-    result[unique_id_column] = row[unique_id_column]
-    for new_col, gpt_key in handled_output.items():
-        result[new_col] = gpt_key
+        # ---- Error Handling Step: Prepare error result ----
+        result = row.to_dict()
+        result[unique_id_column] = row[unique_id_column]
 
-    result["total_tokens"] = token_usage
-    result["input_tokens"] = prompt_usage #type: ignore
-    result["completion_tokens"] = completion_usage  #type: ignore
+        result["total_tokens"] = None
+        result["input_tokens"] = None
+        result["completion_tokens"] = None
+        result["error"] = str(err)  # Add the error message to the 'error' column
 
-    # REMOVED appending to global list
-    # with output_lock:
-    #     output_list.append(result)
-
-    # RETURN the result instead
     return result
 
 
 def call_gpt_llm_client(
-    prompt, credentials, model="gpt-4o-mini", temperature=0.7, time_delay=60
+    prompt, credentials, model="gpt-4o-mini", temperature=0.3, time_delay=60
 ):
     """
     Calls Azure GPT LLM client and handles retries.
@@ -106,29 +115,43 @@ def call_gpt_llm_client(
             return response.choices[0].message.content, response.usage
         except Exception as e:
             logging.warning(f"Retry {attempt + 1}/{retries} failed: {e}")
-            time.sleep(time_delay)
+            if attempt < retries - 1:
+                time.sleep(time_delay)
+            else:
+                # If this is the last retry, re-raise the exception
+                raise e
+    # This line is technically unreachable due to the raise in the loop but is good practice
     raise RuntimeError("Max retries exceeded in GPT call")
 
 
 def handling_gpt_output(gpt_response):
     """
     Extracts and formats GPT response into JSON safely.
+    - Finds content between the first '{' and last '}'.
+    - Parses it into a dict if valid JSON.
+    - If no braces exist, returns the raw output.
     """
     if not gpt_response:
         return {}
 
-    try:
-        parsed = json.loads(gpt_response)
-        if isinstance(parsed, dict):
-            return parsed
-        return {"raw_output": parsed}
-    except Exception:
-        return {"raw_output": gpt_response.strip()}
+    # Find JSON substring between first '{' and last '}'
+    match = re.search(r"\{.*\}", gpt_response, re.DOTALL)
+    if match:
+        json_str = match.group(0).strip()
+        try:
+            parsed = json.loads(json_str)
+            if isinstance(parsed, dict):
+                return parsed
+            return {"raw_output": parsed}
+        except Exception:
+            return {
+                "raw_output": json_str
+            }  # Return extracted string if JSON parsing fails
+
+    # No curly braces found → return raw response
+    return {"raw_output": gpt_response.strip()}
 
 
-# -------------------------
-# Threaded Execution
-# -------------------------
 def execute_threads(
     dataframe,
     job_title,
@@ -136,7 +159,6 @@ def execute_threads(
     unique_id_column,
     placeholder_field,
     output_field,
-    chunk_size,
     credentials,
     thread_count,
 ):
@@ -144,16 +166,14 @@ def execute_threads(
     Multithreaded processing of rows.
     Manages its own local list for results.
     """
-    # Create a list and lock LOCAL to this function call
     local_output_list = []
     output_lock = threading.Lock()
-    
+
     threads = []
     progress = tqdm(total=len(dataframe), desc="Processing Rows")
 
     def worker(rows):
         for _, row in rows.iterrows():
-            # Get the result dictionary from the function
             result = genai_keyword_category_mapping(
                 row,
                 job_title,
@@ -161,13 +181,11 @@ def execute_threads(
                 placeholder_field,
                 unique_id_column,
                 output_field,
-                chunk_size,
                 credentials,
             )
-            # Safely append the result to the LOCAL list
             with output_lock:
                 local_output_list.append(result)
-                
+
             progress.update(1)
 
     thread_chunk_size = len(dataframe) // thread_count
@@ -182,8 +200,7 @@ def execute_threads(
         thread.join()
 
     progress.close()
-    
-    # Return a DataFrame created from the LOCAL list
+
     return pd.DataFrame(local_output_list)
 
 
@@ -195,6 +212,7 @@ def generate_summary_json(
 ) -> dict:
     """
     Generate summary statistics and preview JSON for frontend.
+    - NEW: Handles potential None/NaN values in token columns for robust calculations.
     """
     buffer = io.StringIO()
     output_df.to_csv(buffer, index=False)
@@ -202,15 +220,23 @@ def generate_summary_json(
     encoded_file = base64.b64encode(csv_bytes).decode("utf-8")
 
     total_rows = len(output_df)
-    avg_input_tokens = output_df["input_tokens"].replace("N/A", 0).astype(float).mean()
-    avg_completion_tokens = (
-        output_df["completion_tokens"].replace("N/A", 0).astype(float).mean()
-    )
-    avg_total_tokens = output_df["total_tokens"].replace("N/A", 0).astype(float).mean()
+
+    # Use pd.to_numeric to safely convert, coercing errors to NaN, then fill with 0
+    input_tokens = pd.to_numeric(output_df["input_tokens"], errors="coerce").fillna(0)
+    completion_tokens = pd.to_numeric(
+        output_df["completion_tokens"], errors="coerce"
+    ).fillna(0)
+    total_tokens = pd.to_numeric(output_df["total_tokens"], errors="coerce").fillna(0)
+
+    avg_input_tokens = input_tokens.mean()
+    avg_completion_tokens = completion_tokens.mean()
+    avg_total_tokens = total_tokens.mean()
+
     avg_cost_per_row = (avg_input_tokens * input_token_cost) + (
         avg_completion_tokens * completion_token_cost
     )
-    row_preview = output_df.head(max_preview).to_dict(orient="records")
+    # Fill NaN values for JSON serialization compatibility
+    row_preview = output_df.head(max_preview).fillna("N/A").to_dict(orient="records")
 
     summary = {
         "total_test_rows_processed": total_rows,
@@ -236,21 +262,38 @@ def execute_test_process(
 ):
     """
     Main function to execute the process.
+    - NEW: Checks if unique_id_column is provided. If not, it creates a default one.
     """
+
+    # ---- NEW: Handle null unique_id_column ----
+    if not unique_id_column:
+        unique_id_column = "unique_id"
+        logging.info(
+            f"No unique_id_column provided. Creating new column '{unique_id_column}'."
+        )
+        # Ensure the new column name doesn't already exist
+        if unique_id_column in dataframe.columns:
+            raise ValueError(
+                f"Default ID column '{unique_id_column}' already exists in the dataframe. Please provide a unique column name."
+            )
+        # Assign incrementing integers as the unique ID
+        dataframe[unique_id_column] = range(len(dataframe))
+
+    test_df = dataframe.head(chunk_size)
+
     output_df = execute_threads(
-        dataframe,
+        test_df,
         job_title,
         prompt,
         unique_id_column,
         placeholder_field,
         output_field,
-        chunk_size,
         credentials,
         thread_count=10,
     )
 
     output_df.to_csv("test-output.csv", index=False)
-    logging.info("✅ Content generation completed and saved to 'output.csv'")
+    logging.info("✅ Content generation completed and saved to 'test-output.csv'")
 
     cost_per_input_token = 0.00000015
     cost_per_completion_token = 0.0000006
@@ -261,9 +304,6 @@ def execute_test_process(
         completion_token_cost=cost_per_completion_token,
         max_preview=20,
     )
-    
-    # This debug line is removed as the global list no longer exists
-    # print(f"length of list is abhishek: {len(output_list)}")
 
     return final_output
 
@@ -310,4 +350,3 @@ def execute_test_process(
 #         credentials=credentials,
 #     )
 #     print(result_df)
-
