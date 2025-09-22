@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataProcessor Pro</title>
+    <link rel="icon" type="image/x-icon" href="https://www.justdial.com/favicon.ico">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
@@ -837,9 +838,9 @@
                             <label for="chunkSize" class="form-label">Chunk Size</label>
                             <div class="slider-group">
                                 <div class="slider-container">
-                                    <input type="range" class="slider" id="chunkSize" min="100" max="5000" value="1000" step="100">
+                                    <input type="range" class="slider" id="chunkSize" min="1" max="100" value="20" step="10">
                                 </div>
-                                <input type="number" id="chunkSizeInput" class="form-input slider-value-input" value="1000" min="100" max="5000">
+                                <input type="number" id="chunkSizeInput" class="form-input slider-value-input" value="20" min="1" max="100">
                             </div>
                         </div>
                         
@@ -868,7 +869,7 @@
                          </div>
                          <div class="form-group">
                             <label for="temperature" class="form-label">Temperature</label>
-                            <input type="number" id="temperature" class="form-input" placeholder="e.g., 0.7" min="0" max="2" step="0.1" value="0.7">
+                            <input type="number" id="temperature" class="form-input" placeholder="e.g., 0.3" min="0" max="2" step="0.1" value="0.3">
                              <div id="temperatureError" class="form-error">Temperature must be between 0 and 2.</div>
                          </div>
                          <div class="form-navigation">
@@ -926,13 +927,13 @@
             uniqueIdField: null,
             outputJson: null,
             config: {
-                chunkSize: 1000
+                chunkSize: 20
             },
             credentials: {
                 endpoint: null,
                 apiKey: null,
                 deploymentName: null,
-                temperature: 0.7
+                temperature: 0.3
             }
         };
 

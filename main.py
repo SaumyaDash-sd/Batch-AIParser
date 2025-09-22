@@ -29,10 +29,8 @@ templates = Jinja2Templates(directory="frontend/templates")
 async def serve_home():
     return FileResponse("frontend/templates/index.html")
 
+
 # Mount login router under /auth
 app.include_router(login_setup.login_router, prefix="/auth")
 app.include_router(test_process.test_process_router, prefix="/test-job")
 app.include_router(job_history.job_history_router, prefix="/job")
-
-
-
