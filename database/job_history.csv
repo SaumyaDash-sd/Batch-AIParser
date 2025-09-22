@@ -1,3 +1,6 @@
 id,user_id,job_title,file_name,job_type,status,total_rows_processed,model,avg_input_token,avg_completion_token,avg_total_token,avg_cost_per_row,created_at,updated_at,deleted_at
 547b5348-bf9a-4dbd-8368-2216d5bbfa7c,6b928164-58f6-418f-91f0-6f7529ba6823,my-first-test-job,sample-file-10-rows.csv,test-job,completed,10,gpt-4o-mini,147.4,23.2,170.6,3.603e-05,2025-09-15T22:12:50.049544,2025-09-15T22:12:50.049567,
-2c413206-c92f-49aa-a554-031739bf4958,6b928164-58f6-418f-91f0-6f7529ba6823,my-second-test-job,sample-file-10-rows.csv,test-job,completed,5,gpt-4o-mini,146.6,23.0,169.6,3.578999999999999e-05,2025-09-15T22:16:25.156510,2025-09-15T22:16:25.156526,
+2c413206-c92f-49aa-a554-031739bf4958,6b928164-58f6-418f-91f0-6f7529ba6823,my-second-test-job,sample-file-10-rows.csv,test-job,failed,5,gpt-4o-mini,146.6,23.0,169.6,3.578999999999999e-05,2025-09-15T22:16:25.156510,2025-09-15T22:16:25.156526,
+6c6d1549-486c-43e9-894c-d72b9f2d8d24,6b928164-58f6-418f-91f0-6f7529ba6823,abcd,sample-file-10-rows.csv,test-job,processing,10,gpt-4o-mini,369.2,717.8,1087.0,0.0004860599999999,2025-09-16T13:44:45.999431,2025-09-16T13:44:45.999443,
+2468d6f2-6ea7-4e99-bcc9-56e151a42acb,6b928164-58f6-418f-91f0-6f7529ba6823,Hello,sample-file-10-rows.csv,test-job,completed,10,gpt-4o-mini,0.0,0.0,0.0,0.0,2025-09-22T16:25:38.376592,2025-09-22T16:25:38.376599,
+a4b5fbf4-10da-4200-9558-3b844e36948a,6b928164-58f6-418f-91f0-6f7529ba6823,"Hello, 22 septemer",sample-file-10-rows.csv,test-job,completed,10,gpt-4o-mini,8.0,28.5,36.5,1.83e-05,2025-09-22T16:31:58.035362,2025-09-22T16:31:58.035370,

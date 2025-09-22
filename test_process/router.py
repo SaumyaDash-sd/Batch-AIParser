@@ -1,7 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Response
 
 from .main import test_prompt_process
-from pydantic import BaseModel
 from login_setup import authenticate_user_token
 import pandas as pd
 import io

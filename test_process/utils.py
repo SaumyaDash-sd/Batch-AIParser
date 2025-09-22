@@ -1,15 +1,17 @@
-import os
 import io
 import base64
 import threading
 import pandas as pd
 import logging
 import json
+import re
+import time
+
+
 from tqdm import tqdm
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-import re
-import time
+
 
 # Load environment variables
 load_dotenv()
@@ -67,7 +69,6 @@ def genai_keyword_category_mapping(
         # for new_col in output_field.values():
         #     # Get the corresponding key from the handled_output, default to None if not found
         #     result[new_col] = handled_output.get(new_col, None)
-
 
         # Add token usage and error column (as None for success)
         result["total_tokens"] = usage.total_tokens if usage else None
