@@ -47,7 +47,7 @@ login_setup/
 
 - Main endpoints inside `login_router`:
 
-  ```python
+  ```python 
   @login_router.get("/login/{email}/{password}")
   @login_router.get("/validate-access-token/")
 Responsibilities:
