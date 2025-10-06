@@ -38,6 +38,7 @@ def test_prompt_process(user_id, file_name, dataframe, description_json):
             "avg_completion_token": result["average_completion_token"],
             "avg_total_token": result["average_total_token"],
             "avg_cost_per_row": result["average_cost_per_row"],
+            "prompt": [prompt]
         }
         append_job_history(user_id, job_data)
     except Exception as err:

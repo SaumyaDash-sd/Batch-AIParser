@@ -1885,7 +1885,8 @@
                 `;
 
                     document.getElementById('downloadCsvBtn').addEventListener('click', () => {
-                        downloadBase64File(data.file_data, `test_results_${Date.now()}.csv`);
+                        // downloadBase64File(data.file_data, `test_results_${Date.now()}.csv`);
+                        downloadBase64File(data.file_data, `test_results_${data.job_title}.csv`);
                     });
 
                 } else {
@@ -2026,6 +2027,7 @@
                     '📤 Avg. Output Tokens': job.avg_completion_token.toFixed(1),
                     '🔄 Avg. Total Tokens': job.avg_total_token.toFixed(1),
                     '💲 Avg. Cost / Row': `$${job.avg_cost_per_row.toPrecision(4)}`,
+                    '✍️ Prompt Used': job.prompt,
                     '🕒 Created At': new Date(job.created_at).toLocaleString(),
                     // '🔄 Updated At': new Date(job.updated_at).toLocaleString(),
                 };

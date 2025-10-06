@@ -46,6 +46,7 @@ def append_job_history(user_id: str, job_data: dict):
         "avg_completion_token": job_data.get("avg_completion_token", 0),
         "avg_total_token": job_data.get("avg_total_token", 0),
         "avg_cost_per_row": job_data.get("avg_cost_per_row", 0.0),
+        "prompt": job_data.get("prompt", None),
         "created_at": datetime.now().isoformat(),
         "updated_at": datetime.now().isoformat(),
         "deleted_at": None,

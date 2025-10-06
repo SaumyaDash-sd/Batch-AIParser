@@ -1,1 +1,1 @@
-id,user_id,job_id,job_title,file_name,job_type,status,created_at,updated_at,deleted_at
+id,user_id,job_id,job_title,file_name,job_type,status,prompt,created_at,updated_at,deleted_at

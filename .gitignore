@@ -4,4 +4,6 @@ vnvv
 **__pycache__**
 *test*
 *.pyc*
+*.csv
+*database
 # .gitignore

@@ -305,7 +305,8 @@ def execute_test_process(
         completion_token_cost=cost_per_completion_token,
         max_preview=20,
     )
-
+    final_output["job_title"] = job_title
+    
     return final_output
 
 
