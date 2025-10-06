@@ -5,7 +5,7 @@ from .utils import execute_test_process
 from job_history import append_job_history
 
 
-def test_prompt_process(user_id, file_name,  dataframe, description_json):
+def test_prompt_process(user_id, file_name, dataframe, description_json):
     job_title = description_json["job_title"]
     prompt = description_json["prompt"]
     placeholder_field = description_json["placeholder_field"]
@@ -14,7 +14,6 @@ def test_prompt_process(user_id, file_name,  dataframe, description_json):
     chunk_size = description_json["config"]["chunkSize"]
     credentials = description_json["credentials"]
 
-
     result = execute_test_process(
         dataframe=dataframe,
         job_title=job_title,
@@ -22,8 +21,8 @@ def test_prompt_process(user_id, file_name,  dataframe, description_json):
         placeholder_field=placeholder_field,
         unique_id_column=unique_id_field,
         output_field=output_field,
-        chunk_size = chunk_size,
-        credentials = credentials,
+        chunk_size=chunk_size,
+        credentials=credentials,
     )
 
     # Save test job summary in database (.csv)
@@ -43,5 +42,5 @@ def test_prompt_process(user_id, file_name,  dataframe, description_json):
         append_job_history(user_id, job_data)
     except Exception as err:
         logging.info(f"Got error while appending test-job: {err}")
-    
+
     return result
