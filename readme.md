@@ -214,8 +214,6 @@ The user presses the **“Start Processing”** button.
 ➡️ This triggers the **backend API**:
 /test-job/process/test-prompt/
 
-yaml
-Copy code
 
 ---
 
@@ -238,11 +236,12 @@ test_process/
 ├── main.py
 ├── router.py
 └── utils.py
+
+
+
 📡 Step 6 - Router Layer (router.py)
 Main endpoint:
 
-python
-Copy code
 @test_process_router.post("/process/test-prompt/")
 Responsibilities:
 Receive all values entered by the user on the frontend:
@@ -265,6 +264,8 @@ If the user is authenticated, proceed further.
 
 Convert all received values into required backend formats for processing.
 
+
+
 🧠 Step 7 - Data Conversion Logic
 Before executing the main logic:
 
@@ -283,6 +284,8 @@ It is read as a Pandas DataFrame.
 
 The columns of this DataFrame are used across multiple internal processes.
 
+
+
 🧩 Step 8 - Core Logic (test_process/main.py)
 After successful format conversions:
 
@@ -298,6 +301,8 @@ Run GPT API calls using credentials entered by the user.
 Process the data row-by-row (or in chunks based on chunk_size).
 
 Store intermediate results or required info in the database.
+
+
 
 🛠 Step 9 - Utilities (utils.py)
 The utility functions in utils.py handle:
@@ -330,8 +335,7 @@ Preview display
 Download option (user can download processed file)
 
 🔄 Summary Flow Diagram
-pgsql
-Copy code
+
 User (Frontend)
     ↓
 Preview Page (generate_summary_function)
@@ -353,16 +357,7 @@ Logic Layer (test_process/main.py → test_prompt_process → execute_prompt)
 Utilities (utils.py → GPT API + DB Update)
     ↓
 Output DataFrame → Bytes → Frontend (Preview + Download)
-✅ Key Highlights
-Modular design: Router → Logic → Utils → DB
 
-Supports dynamic prompt testing and GPT processing
-
-Secure credential handling (API key, endpoint, etc.)
-
-Real-time preview and downloadable output
-
-Seamless frontend–backend integration
 
 🧱 Tech Stack Summary
 Layer	Technology
@@ -375,17 +370,16 @@ Libraries	Pandas, Pydantic, Uvicorn, Requests
 🚀 Run Command
 To start the backend server:
 
-bash
-Copy code
 uvicorn main:app --reload
+
+
 If your entry file is inside a folder (e.g., backend/main.py), use:
 
-bash
-Copy code
 uvicorn backend.main:app --reload
+
+
 🧩 Folder Overview
-bash
-Copy code
+
 project/
 ├── main.py                  # Entry point
 ├── login_setup/             # Handles user login and authentication
