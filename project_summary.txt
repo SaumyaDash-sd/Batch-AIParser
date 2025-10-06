@@ -1,0 +1,104 @@
+1st step - Login setup for User
+
+1️⃣ Frontend (User Input)
+
+User enters:
+username
+password
+
+Clicks Submit button.
+On submit → values (username, password) are sent to the backend Auth API.
+
+------------------------------------------------------------------------------------------------------------
+
+2️⃣ Backend Entry Point (main.py)
+
+Request hits main.py (backend entry).
+Router check: identifies which router to call → login_router. (prefix - auth)
+
+Now logic for login_router endpoint is added in login_setup folder which has the below files:
+__init__.py
+main.py
+router.py
+utils.py
+
+The values reached till the login_router API which is written inside the login_setup/router.py file. 
+
+------------------------------------------------------------------------------------------------------------
+
+3️⃣ Router Layer (router.py)
+Main Endpoints inside login_router -> @login_router.get("/login/{email}/{password}") and @login_router.get("/validate-access-token/")
+
+Receives username & password from the frontend request.
+Passes these values for validation.
+
+This file only contains what should happen if the credentials from the frontend is valid to get authenticated or not and what should be returned if authentication sucessful or what should be returned if the authentication is failed. 
+
+The logics which makes the authentication sucessful or failed is written in the (login_setup/main.py)
+
+------------------------------------------------------------------------------------------------------------
+
+4️⃣ Validation Logic (login_setup/main.py)
+
+Here, the core login validation is handled:
+Compare user credentials against database records. Return whatever will be helped later either to be appended in the database or sent to the frontend to be displayed to the user in either failed or successful login. 
+
+Return True (Successful) or False (Unsuccessful).
+
+
+---------------------------------------------------------------------------------------------------------------
+
+5️⃣ Database Interaction (Helper Functions)
+
+Additional functions that support login flow:
+Read database → Fetch user details for given username.
+Update database → Update last login time, acess_token, unique_id, description, job_title etc.
+
+Other utilities → Any extra operations once the user hits Submit.
+
+--------------------------------------------------------------------------------------------------------
+
+6️⃣ Response Flow
+
+If validation passes → Return Success (with user/session details if required).
+If validation fails → Return Failure (invalid username/password).
+
+Frontend shows appropriate message to user.
+
+🔄 Summary Flow Diagram
+
+Frontend → Backend Main (main.py) → Login Router (router.py) → Validation (login_setup/main.py) → Database (read/update) → Response (Success/Failure)
+
+-----------------------------------------------------------------------------------------------------------
+------------------------------------xxxxxxxxxxxxxxxxxxxxxxxxx----------------------------------------------
+
+
+
+Now, 
+
+If the user valid it is allowed to proceed further.
+Now the user chooses to proceed with Test_process and once the user clicks Test Process tab several input boxes appears.
+- Job Title
+- Your excel file to be used for testing your prompt
+
+
+Once the submit button is clicked the user is moved to the preveiw page and top 20 rows is displayed. (generate_summary_function is called in the frontend itself)
+When next is pressed user lands up to the Prompt page where the user needs to add its prompt and need to select placeholder fields from the uploaded excel sheet. Once the next button is clicked user lands up to the credential pages where user need to fill all the mandatory input boxes with credentials like API Key, Endpoint, Temperature, chunk_size etc. 
+Now once the next button is clicked user lands up to the Overview & Confirmation page and now the main submit button i.e. Start Processing button should be pressed which will ulimately hit the test_process_router, prefix="/test-job" router in the main.py
+
+
+When next the test_process_router router is hit in main.py uses the test_process folder to proceed further and it hits the @test_process_router.post("/process/test-prompt/") endpoint in the router.py 
+
+It first receives all the values entered by the user in the frontend in the input boxes, picks the fields necessary for authentication, if the user is authenticated it moves further. 
+
+Now the values entered by the user be it the excel file, job_title, prompt, fields, credentials., chunk_size or other inputs are converted into the required format in which the main logic functions will receive to be run. 
+
+For example, in frontend the excel sheet is received in the form of Bytes, but we need it in a form of pandas dataframe, so the bytes is first converted into csv/excel format based on the file name uploaded and then is read and stored in a dataframe. Now the columns present in these dataframes will be used further in multiple process used to complete the test_process function.
+
+Similarly other fields like prompt, credentials etc. is stored in akey value pair from the frontend, which we store in multiple variables to be used later. 
+
+Now test_prompt_process in test_process. main.py function is hit and then the execute_prompt is hit to complete the whole GPT calling process and the results are stored in necessary format as required and the information which needs to be stored in the database is appended as per need. 
+
+Finally the GPT calling is done and the output is stored  in a new df and then again converted into bytes to be displayed on the frontend and the option for downloading the file and all also gets available. All the fuctions in utils.py either for completing the GPT calling process by using the user's prompt and all and appending useful information in our database is done. 
+
+
