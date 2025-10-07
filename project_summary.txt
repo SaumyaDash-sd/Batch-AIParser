@@ -102,3 +102,16 @@ Now test_prompt_process in test_process. main.py function is hit and then the ex
 Finally the GPT calling is done and the output is stored  in a new df and then again converted into bytes to be displayed on the frontend and the option for downloading the file and all also gets available. All the fuctions in utils.py either for completing the GPT calling process by using the user's prompt and all and appending useful information in our database is done. 
 
 
+
+----------------------------------------------------------------------------------------------------------------
+
+Job History Feature
+
+When user clicks the Job History Tab on the frontend, it hits 'job_history_router' router and hits the below APIs
+get_test_jobs ("/history/test-job/") and authenticate user and sends response if not a valid user, if authentication is sucessful then fetches all the job information from the database for that user_id and access_token
+
+if the user history is empty then sends response as No Job details 
+
+if user history present then returns a dictionary of information for the jobs.
+
+A similar API is hit when user clicks on the delete job button on the fronted, it authenticates, checks and if user history present it removes that row from the database and responds that the job has been deleted.
