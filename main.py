@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 import login_setup
 import test_process
 import job_history
+import batch_process
 
 
 app = FastAPI()
@@ -34,3 +35,4 @@ async def serve_home():
 app.include_router(login_setup.login_router, prefix="/auth")
 app.include_router(test_process.test_process_router, prefix="/test-job")
 app.include_router(job_history.job_history_router, prefix="/job")
+app.include_router(batch_process.batch_process_router, prefix="/batch-job")

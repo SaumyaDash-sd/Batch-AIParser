@@ -278,7 +278,7 @@ def execute_test_process(
                 f"Default ID column '{unique_id_column}' already exists in the dataframe. Please provide a unique column name."
             )
         # Assign incrementing integers as the unique ID
-        dataframe[unique_id_column] = range(len(dataframe))
+        dataframe[unique_id_column] = range(1, len(dataframe) + 1)
 
     test_df = dataframe.head(chunk_size)
 

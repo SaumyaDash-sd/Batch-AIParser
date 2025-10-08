@@ -1,3 +1,7 @@
+# DATA PROCESSOR PRO
+
+
+
 # 🔐 Login Setup Flow
 
 This document explains the **end-to-end flow** of the Login Setup logic in our project — from user input on the frontend to database validation and final response.  
@@ -68,31 +72,24 @@ The actual validation logic is implemented in login_setup/main.py.
 
 
 
-📌 Step 4 - Validation Logic (login_setup/main.py)
+## 📌 Step 4 - Validation Logic (login_setup/main.py)
 Core login validation is handled here:
-
 Compare user credentials against database records.
-
 Return necessary values that can later:
-
 Be appended in the database
-
 Or sent to the frontend for display
 
 Returns:
-
 True → Successful login
-
 False → Unsuccessful login
 
 
 
 
-📌 Step 5 - Database Interaction (Helper Functions)
+# 📌 Step 5 - Database Interaction (Helper Functions)
 Functions that support login flow:
 
 Read Database → Fetch user details for given username.
-
 Update Database → Update:
 
 - last login time
@@ -110,7 +107,7 @@ Utilities → Extra operations when user hits Submit.
 
 
 
-📌 Step 6 - Response Flow
+## 📌 Step 6 - Response Flow
 If validation passes →
 Return Success ✅ (with user/session details if required)
 
@@ -122,7 +119,7 @@ Frontend displays appropriate message to user.
 
 
 
-🔄 Summary Flow Diagram
+## 🔄 Summary Flow Diagram
 
 Frontend (User Input)
         ↓
@@ -135,7 +132,9 @@ Validation (login_setup/main.py)
 Database (Read/Update)
         ↓
 Response (Success / Failure)
-✅ Conclusion
+
+
+## ✅ Conclusion
 This setup ensures a clean separation of concerns:
 
 Frontend → Collects input
@@ -239,7 +238,7 @@ test_process/
 
 
 
-📡 Step 6 - Router Layer (router.py)
+## 📡 Step 6 - Router Layer (router.py)
 Main endpoint:
 
 @test_process_router.post("/process/test-prompt/")
@@ -247,26 +246,18 @@ Responsibilities:
 Receive all values entered by the user on the frontend:
 
 Excel file (in bytes)
-
 Job Title
-
 Prompt
-
 Placeholder fields
-
 Credentials (API key, endpoint, temperature, etc.)
-
 Chunk size
-
 Authenticate the user using the provided authentication details.
-
 If the user is authenticated, proceed further.
-
 Convert all received values into required backend formats for processing.
 
 
 
-🧠 Step 7 - Data Conversion Logic
+## 🧠 Step 7 - Data Conversion Logic
 Before executing the main logic:
 
 The raw data received from frontend must be transformed into usable formats.
@@ -281,47 +272,35 @@ Fields	JSON List	Python List	Placeholder replacements
 📘 Once the Excel file is converted:
 
 It is read as a Pandas DataFrame.
-
 The columns of this DataFrame are used across multiple internal processes.
 
 
 
-🧩 Step 8 - Core Logic (test_process/main.py)
+## 🧩 Step 8 - Core Logic (test_process/main.py)
 After successful format conversions:
 
 The function test_prompt_process() is triggered.
-
 Inside this, execute_prompt() is called — which runs the main GPT calling logic.
 
 Responsibilities:
 Execute the user-provided prompt on the data.
-
 Run GPT API calls using credentials entered by the user.
-
 Process the data row-by-row (or in chunks based on chunk_size).
-
 Store intermediate results or required info in the database.
 
 
 
-🛠 Step 9 - Utilities (utils.py)
+## 🛠 Step 9 - Utilities (utils.py)
 The utility functions in utils.py handle:
-
 GPT API interaction and processing logic.
-
 Formatting and transforming the GPT responses.
-
 Appending important details in the database, such as:
-
 Job details
-
-Processing cost
-
-User activity tracking
-
+Processing costUser activity tracking
 Any metadata required for audit or usage analytics
 
-💾 Step 10 - Final Output Handling
+
+## 💾 Step 10 - Final Output Handling
 Once the GPT processing is completed:
 
 The output is stored in a new DataFrame.
@@ -334,7 +313,7 @@ Preview display
 
 Download option (user can download processed file)
 
-🔄 Summary Flow Diagram
+## 🔄 Summary Flow Diagram
 
 User (Frontend)
     ↓
@@ -359,7 +338,7 @@ Utilities (utils.py → GPT API + DB Update)
 Output DataFrame → Bytes → Frontend (Preview + Download)
 
 
-🧱 Tech Stack Summary
+## 🧱 Tech Stack Summary
 Layer	Technology
 Frontend	React / Next.js (with API integration)
 Backend	FastAPI
@@ -367,7 +346,7 @@ Database	PostgreSQL / MySQL (depending on setup)
 Model API	GPT / LLM (via API key + endpoint)
 Libraries	Pandas, Pydantic, Uvicorn, Requests
 
-🚀 Run Command
+## 🚀 Run Command
 To start the backend server:
 
 uvicorn main:app --reload
@@ -378,7 +357,7 @@ If your entry file is inside a folder (e.g., backend/main.py), use:
 uvicorn backend.main:app --reload
 
 
-🧩 Folder Overview
+## 🧩 Folder Overview
 
 project/
 ├── main.py                  # Entry point
@@ -390,3 +369,154 @@ project/
 │   └── utils.py             # Helper and GPT-related functions
 └── requirements.txt
 
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+# 🧾 Job History Feature
+
+This section explains the **Job History functionality** — how the system handles fetching, authenticating, and managing the user’s previously executed test jobs.
+
+---
+
+## 🧭 Step 1 - Frontend (User Interaction)
+
+When the **user clicks the “Job History” tab** on the frontend:
+
+- A request is sent to the **backend router → `job_history_router`**.
+- The following APIs are triggered:
+  ```python
+  @job_history_router.get("/history/test-job/")
+  @job_history_router.delete("/history/delete-job/")
+
+
+
+## 📡 Step 2 - Backend Router (job_history_router)
+When the /history/test-job/ API is hit:
+
+The backend authenticates the user using:
+
+user_id
+access_token
+
+If authentication fails:
+Response: ❌ "Invalid user credentials"
+
+If authentication is successful:
+Fetch all job details for that user_id from the database.
+
+
+
+## 🗂 Step 3 - Database Fetching Logic
+Once the user is validated:
+
+The backend queries the database for all jobs associated with that user_id.
+
+Each job record may include details like:
+
+- Job Title
+- Date of Execution
+- Prompt Used
+- Model Name / Endpoint
+- Output File Name
+- Status (Completed / Failed)
+- Last Updated Timestamp
+
+Possible Responses:
+Scenario	Backend Response
+❌ No jobs found	"No job details"
+✅ Jobs found	Dictionary of all job-related information
+
+Example Response:
+{
+  "user_id": "12345",
+  "job_history": [
+    {
+      "job_id": "job_001",
+      "job_title": "Product Keyword Mapping",
+      "status": "Completed",
+      "model_used": "gpt-4",
+      "processed_rows": 500,
+      "timestamp": "2025-10-04T14:32:00"
+    },
+    {
+      "job_id": "job_002",
+      "job_title": "Invoice Summary Generation",
+      "status": "Completed",
+      "model_used": "gpt-4-mini",
+      "processed_rows": 300,
+      "timestamp": "2025-10-03T10:22:15"
+    }
+  ]
+}
+
+
+## 🗑 Step 4 - Delete Job Functionality
+When the user clicks “Delete Job” on the frontend:
+
+- The same job_history_router is triggered.
+
+The delete endpoint is hit:
+@job_history_router.delete("/history/delete-job/")
+Steps:
+
+Authenticate the user again using user_id and access_token.
+Check if the specified job_id exists in that user’s history.
+
+If found → remove that record from the database.
+Send confirmation message back to frontend.
+
+Response Scenarios:
+
+Scenario	Response
+✅ Job found & deleted	"Job deleted successfully"
+❌ Invalid user	"User authentication failed"
+❌ Job not found	"No such job found in history"
+
+## 🧩 Step 5 - Folder Structure
+
+
+job_history/
+├── __init__.py
+├── router.py          # Contains all job history endpoints
+├── main.py            # Core logic to fetch, delete, or validate jobs
+└── utils.py           # Helper functions for authentication and DB queries
+
+
+## 🔄 Summary Flow Diagram
+
+Frontend (Job History Tab)
+        ↓
+Backend main.py
+        ↓
+job_history_router
+        ↓
+Authenticate User (user_id + access_token)
+        ↓
+IF Invalid → Return "Invalid User"
+        ↓
+ELSE
+    ↓
+Fetch Job History from DB
+    ↓
+IF Empty → Return "No Job details"
+    ↓
+ELSE → Return Job History Dictionary
+
+
+## 🔁 Delete Flow:
+pgsql
+Copy code
+Frontend (Delete Job Button)
+        ↓
+job_history_router (DELETE /history/delete-job/)
+        ↓
+Authenticate User
+        ↓
+Check Job Existence in DB
+        ↓
+IF Found → Delete Row → Return "Job deleted successfully"
+        ↓
+IF Not Found → Return "No such job found"
