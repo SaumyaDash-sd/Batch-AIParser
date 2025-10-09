@@ -4,6 +4,5 @@ vnvv
 **__pycache__**
 *test*
 *.pyc*
-*.csv
-*database
+.DS_Store
 # .gitignore

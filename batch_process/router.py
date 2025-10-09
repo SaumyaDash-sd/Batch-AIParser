@@ -1,17 +1,25 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Response
-
-from .main import batch_processing_create_file, batch_processing_upload_file
-from login_setup import authenticate_user_token
 import pandas as pd
 import io
 import json
 
 
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Response
+from pydantic import BaseModel
+
+
+from .main import (
+    batch_processing_create_and_upload_file,
+    batch_processing_upload_file,
+    start_batch_of_file_ids,
+)
+from login_setup import authenticate_user_token
+
+
 batch_process_router = APIRouter()
 
 
-@batch_process_router.post("/process/create-file/")
-async def create_file_for_batch(
+@batch_process_router.post("/process/create-upload-file/")
+async def create_and_upload_file(
     user_id: str,
     access_token: str,
     response: Response,
@@ -43,12 +51,41 @@ async def create_file_for_batch(
         else:
             response.status_code = 400
             raise HTTPException(status_code=400, detail="Unsupported file type")
-        result = batch_processing_create_file(user_id, file.filename, df, description_json)
+        result = batch_processing_create_and_upload_file(
+            user_id, file.filename, df, description_json
+        )
         response.status_code = 200
+        result["message"] = "Data pre-processing and upload done"
         return result
 
 
-@batch_process_router.post("/process/upload-file/")
+class StartBatchModel(BaseModel):
+    file_ids: list
+
+
+@batch_process_router.post("/process/create-start-batch/")
+async def create_and_start_batch(
+    user_id: str,
+    access_token: str,
+    job_id: str,
+    response: Response,
+    list_of_file_ids: StartBatchModel,  # Will contain JSON string
+):
+    # access_token = "e284aabe-2e54-4b11-b1f8-ff2b4c81d9d7"
+    # Validate user_id and access_token  and status active
+    if not authenticate_user_token(user_id, access_token):
+        response.status_code = 401
+        raise HTTPException(status_code=401, detail="Unauthorized User")
+    else:  
+        result = start_batch_of_file_ids(
+            user_id, job_id, list_of_file_ids
+        )
+        response.status_code = 200
+        result["message"] = "Data pre-processing and upload done"
+        return result
+
+
+@batch_process_router.post("/process/upload-file/", deprecated=True)
 async def upload_file_for_batch(
     user_id: str,
     access_token: str,
@@ -81,7 +118,9 @@ async def upload_file_for_batch(
         else:
             response.status_code = 400
             raise HTTPException(status_code=400, detail="Unsupported file type")
-        result = batch_processing_upload_file(user_id, file.filename, df, description_json)
+        result = batch_processing_upload_file(
+            user_id, file.filename, df, description_json
+        )
         response.status_code = 200
         return result
 
