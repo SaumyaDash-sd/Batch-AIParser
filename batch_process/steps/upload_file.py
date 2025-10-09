@@ -97,6 +97,7 @@ def start_process(dataframe, file_name, description_json):
     prompt_column_name = "prompt"
     unique_id_column_name = description_json["unique_id_field"]
     credentials = description_json["credentials"]
+    config = description_json["config"]
     client = AzureOpenAI(
         api_key=credentials["apiKey"],
         azure_endpoint=credentials["endpoint"],
@@ -104,11 +105,12 @@ def start_process(dataframe, file_name, description_json):
     )
     model_name = credentials["deploymentName"]
     temperature = credentials["temperature"]
-    
-    dataframe_chunks_list = split_dataframe_into_chunks(dataframe, 20)
+    chunk_size = config["chunkSize"]
+
+    dataframe_chunks_list = split_dataframe_into_chunks(dataframe, chunk_size)
     final_output = []
-    for chunk in dataframe_chunks_list:
-        output = upload_dataframe_as_jsonl(
+    for index, chunk in enumerate(dataframe_chunks_list, start=1):
+        file_id, status = upload_dataframe_as_jsonl(
             chunk,
             prompt_column_name,
             unique_id_column_name,
@@ -117,14 +119,19 @@ def start_process(dataframe, file_name, description_json):
             model_name,
             temperature,
         )
-        final_output.append(output)
+        final_output.append(
+            {
+                "file_id": file_id,
+                "status": status,
+                "chunk_no": f"chunk_{index}",
+                "total_rows_processed": len(chunk),
+            }
+        )
 
-    return {
-        "file_ids": final_output
-    }
+    return final_output
 
 
-if __name__ == "__main__":   
+if __name__ == "__main__":
     dataframe = pd.read_excel("test output.xlsx")
     unique_id_column_name = "UNIQUE_ID"  # Column to be used as custom_id
     prompt_column_name = "prompt"
@@ -143,8 +150,6 @@ if __name__ == "__main__":
     )
     model_name = credentials["deploymentName"]
     temperature = credentials["temperature"]
-
-
 
     dataframe_chunks_list = split_dataframe_into_chunks(dataframe, 20)
 

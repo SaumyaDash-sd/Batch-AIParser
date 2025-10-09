@@ -1,0 +1,1 @@
+id,user_id,job_title,file_name,job_type,chunks,chunk_size,total_rows_processed,model,endpoint,api_key,prompt,created_at,updated_at,deleted_at

@@ -22,7 +22,6 @@ logging.basicConfig(
 )
 
 
-
 def handling_gpt_output(gpt_response):
     """
     Extracts and formats GPT response into JSON safely.
@@ -51,16 +50,10 @@ def handling_gpt_output(gpt_response):
     return {"raw_output": gpt_response.strip()}
 
 
-def generate_summary_json(
+def convert_df_to_bytes(
     output_df: pd.DataFrame,
-    input_token_cost: float,
-    completion_token_cost: float,
     max_preview: int = 20,
 ) -> dict:
-    """
-    Generate summary statistics and preview JSON for frontend.
-    - NEW: Handles potential None/NaN values in token columns for robust calculations.
-    """
     buffer = io.StringIO()
     output_df.to_csv(buffer, index=False)
     csv_bytes = buffer.getvalue().encode("utf-8")
@@ -68,34 +61,15 @@ def generate_summary_json(
 
     total_rows = len(output_df)
 
-    # Use pd.to_numeric to safely convert, coercing errors to NaN, then fill with 0
-    input_tokens = pd.to_numeric(output_df["input_tokens"], errors="coerce").fillna(0)
-    completion_tokens = pd.to_numeric(
-        output_df["completion_tokens"], errors="coerce"
-    ).fillna(0)
-    total_tokens = pd.to_numeric(output_df["total_tokens"], errors="coerce").fillna(0)
-
-    avg_input_tokens = input_tokens.mean()
-    avg_completion_tokens = completion_tokens.mean()
-    avg_total_tokens = total_tokens.mean()
-
-    avg_cost_per_row = (avg_input_tokens * input_token_cost) + (
-        avg_completion_tokens * completion_token_cost
-    )
     # Fill NaN values for JSON serialization compatibility
     row_preview = output_df.head(max_preview).fillna("N/A").to_dict(orient="records")
 
     summary = {
         "total_test_rows_processed": total_rows,
-        "average_input_token": round(avg_input_tokens, 2),
-        "average_completion_token": round(avg_completion_tokens, 2),
-        "average_total_token": round(avg_total_tokens, 2),
-        "average_cost_per_row": float(f"{avg_cost_per_row:.20f}"),
         "row_preview_data": row_preview,
         "file_data": encoded_file,
     }
     return summary
-
 
 
 # -------------------------
