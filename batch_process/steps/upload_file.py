@@ -76,7 +76,7 @@ def upload_dataframe_as_jsonl(
     jsonl_bytes.seek(0)
 
     # Add a name attribute so OpenAI client knows the filename
-    jsonl_bytes.name = file_name
+    jsonl_bytes.name = f"{file_name}.jsonl"
 
     # Upload to client
     uploaded_file = client.files.create(file=jsonl_bytes, purpose="batch")
@@ -95,7 +95,7 @@ def upload_dataframe_as_jsonl(
 
 def start_process(dataframe, file_name, description_json):
     prompt_column_name = "prompt"
-    unique_id_column_name = description_json["unique_id_field"]
+    unique_id_column_name = description_json["unique_id_field"] if description_json["unique_id_field"] else "unique_id"
     credentials = description_json["credentials"]
     config = description_json["config"]
     client = AzureOpenAI(

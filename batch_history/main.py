@@ -28,8 +28,11 @@ def append_batch_job_history(user_id: str, job_data: dict):
         "file_name": job_data.get("file_name", None),
         "job_type": job_data.get("job_type", None),
         "chunks": job_data.get("chunks", 0),
+        "chunk_size": job_data.get("chunk_size", 0),
         "total_rows_processed": job_data.get("total_rows_processed", 0),
         "model": job_data.get("model", None),
+        "endpoint": job_data.get("endpoint", None),
+        "api_key": job_data.get("api_key", None),
         "prompt": [job_data.get("prompt", None)],
         "created_at": datetime.now().isoformat(),
         "updated_at": datetime.now().isoformat(),
@@ -81,7 +84,7 @@ def append_uploaded_file_history(
         "message": "Upload file history appended successfully",
         "user_id": user_id,
         "job_id": job_id,
-        "file_id": new_job["id"],
+        "file_id": new_job["file_id"],
     }
 
 
@@ -98,7 +101,7 @@ def append_batch_file_history(
         "file_id": file_id,
         "output_file_id": job_data.get("output_file_id", None),
         "job_type": job_data.get("job_type", None),
-        "status": job_data.get("batch_status", "not_started"),
+        "status": job_data.get("batch_status", "validating"),
         "chunk_no": job_data.get("chunk_no", "chunk_1"),
         "total_rows_processed": job_data.get("total_rows_processed", 0),
         "created_at": datetime.now().isoformat(),
@@ -118,7 +121,7 @@ def append_batch_file_history(
         "user_id": user_id,
         "job_id": job_id,
         "file_id": file_id,
-        "batch_id": new_job["id"],
+        "batch_id": new_job["batch_id"],
     }
 
 
@@ -345,3 +348,96 @@ def get_chunk_no_and_row_count(user_id, job_id, file_id):
         return first_row["chunk_no"], first_row["total_rows_processed"]
     else:
         return None, None
+
+
+def get_file_ids_for_user_and_job(user_id, job_id):
+    # Step 1: Read the DataFrame
+    df = read_uploaded_files()
+
+    # Step 2: Create a mask to filter matching rows (not deleted)
+    mask = (
+        (df["user_id"] == user_id)
+        & (df["job_id"] == job_id)
+        & (df["deleted_at"].isna())
+    )
+
+    # Step 3: Filter matching rows
+    filtered = df[mask]
+
+    # Step 4: Return list of file_ids (unique)
+    if not filtered.empty:
+        file_ids = filtered["file_id"].unique().tolist()
+        return file_ids
+    else:
+        return []
+
+
+def get_batch_status_and_output_file_id(user_id, job_id, batch_id):
+    # Step 1: Read the DataFrame
+    df = read_batch_files()
+
+    # Step 2: Filter for the matching row
+    filtered = df[
+        (df["user_id"] == user_id) &
+        (df["job_id"] == job_id) &
+        (df["batch_id"] == batch_id) &
+        (df["deleted_at"].isna())
+    ]
+
+    # Step 3: Check if any row matches
+    if not filtered.empty:
+        first_row = filtered.iloc[0]
+        result = {
+            "status": first_row["status"],
+            "batch_id": batch_id,
+            "output_file_id": first_row["output_file_id"]
+        }
+    else:
+        # If no match found, return None or some default value
+        result = {
+            "status": None,
+            "batch_id": batch_id,
+            "output_file_id": None
+        }
+
+    # Step 4: Convert to JSON and return
+    return result
+
+
+def update_batch_status_if_changed(user_id, job_id, batch_id, latest_status, output_file_id=None):
+    """
+    Update the batch status and output_file_id in the CSV if the latest_status
+    is different from the current status.
+    
+    Parameters:
+        user_id (int/str)
+        job_id (int/str)
+        batch_id (int/str)
+        latest_status (str)
+        output_file_id (optional, int/str): only updated if status is 'completed'
+    """
+    # Step 1: Read the CSV
+    df = read_batch_files()
+    
+    # Step 2: Create mask for the specific row
+    mask = (
+        (df["user_id"] == user_id) &
+        (df["job_id"] == job_id) &
+        (df["batch_id"] == batch_id) &
+        (df["deleted_at"].isna())
+    )
+    
+    # Step 3: Check if row exists
+    if not df[mask].empty:
+        current_status = df.loc[mask, "status"].iloc[0]
+        
+        # Step 4: Update only if status is different
+        if current_status != latest_status:
+            df.loc[mask, "status"] = latest_status
+            
+            # Update output_file_id if the status is completed and value is provided
+            if latest_status == "completed" and output_file_id is not None:
+                df.loc[mask, "output_file_id"] = output_file_id
+            
+            # Step 5: Write back to CSV
+            write_batch_files(df)

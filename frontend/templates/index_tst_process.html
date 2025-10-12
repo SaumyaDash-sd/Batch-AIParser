@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataProcessor Pro</title>
+    <link rel="icon" type="image/x-icon" href="https://www.justdial.com/favicon.ico">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff7b00 0%, #1e3a8a 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Login Screen Styles */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff7b00 0%, #1e3a8a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-screen::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 450px;
+            width: 90%;
+            animation: slideUp 0.8s ease-out;
+            z-index: 10;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.05);
+            }
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin: 0 auto 1rem;
+            display: block;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            color: white;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #ff7b00;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 123, 0, 0.3);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-error {
+            color: #ffcdd2;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #ff7b00, #1e3a8a);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover:before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff7b00 0%, #1e3a8a 100%);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 20;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .profile-menu {
+            position: relative;
+            z-index: 30;
+        }
+
+        .profile-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff7b00, #1e3a8a);
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            min-width: 250px;
+            z-index: 100;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-info {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .profile-info strong {
+            color: #1e3a8a;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: linear-gradient(45deg, #ff7b00, #1e3a8a);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section-title {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 1;
+        }
+
+        .step.completed:not(:last-child)::after {
+            background: #ff7b00;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0 auto 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-circle {
+            background: linear-gradient(45deg, #ff7b00, #1e3a8a);
+            transform: scale(1.2);
+        }
+
+        .step.completed .step-circle {
+            background: #ff7b00;
+        }
+
+        .step-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .step.active .step-label {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Form Styles */
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .form-navigation {
+            text-align: right;
+            margin-top: 2rem;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .file-upload {
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .file-upload:hover {
+            border-color: #ff7b00;
+            background: rgba(255, 123, 0, 0.1);
+        }
+
+        .file-upload.drag-over {
+            border-color: #ff7b00;
+            background: rgba(255, 123, 0, 0.2);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            background: #6c757d;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff7b00, #1e3a8a);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Table Styles */
+        .data-table-container {
+            overflow-x: auto;
+            max-height: 400px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+        }
+
+        .data-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table td ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+
+        /* Slider Styles */
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slider-container {
+            flex-grow: 1;
+        }
+
+        .slider-label {
+            color: white;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff7b00;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-value-input {
+            width: 80px;
+            text-align: center;
+        }
+
+        .result-container {
+            color: white;
+        }
+
+        .result-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .summary-card-title {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #ffb37c;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ff7b00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Toast Notification Styles */
+        #toastContainer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-out;
+            min-width: 250px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #d32f2f, #c62828);
+        }
+
+        .toast-info {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        }
+
+        /* Job History Styles */
+        #job-history-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 123, 0, 0.5);
+        }
+
+        .job-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #ffb37c;
+        }
+
+        .job-card-detail {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.25rem;
+        }
+
+        .job-card-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: capitalize;
+            margin-top: 1rem;
+        }
+
+        .job-card-status.completed {
+            background-color: #2e7d32;
+        }
+
+        .job-card-status.failed {
+            background-color: #c62828;
+        }
+
+        .job-card-status.processing {
+            background-color: #1e3a8a;
+        }
+
+        .job-delete-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .job-delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .no-jobs-message {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        .no-jobs-icon {
+            font-size: 4rem;
+            opacity: 0.5;
+        }
+
+        .no-jobs-text {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-out;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3a8a, #3c2a68);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            color: white;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .modal-close-btn:hover {
+            opacity: 1;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #ffb37c;
+        }
+
+        .modal-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-detail-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .modal-detail-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-detail-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            word-wrap: break-word;
+        }
+
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .login-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .progress-steps {
+                font-size: 0.8rem;
+                /* Smaller font for labels on mobile */
+            }
+
+            .step-circle {
+                width: 30px;
+                height: 30px;
+            }
+
+            .step:not(:last-child)::after {
+                top: 15px;
+                /* Adjust line position */
+            }
+
+            .modal-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div id="loginScreen" class="login-screen">
+            <div class="login-container">
+                <div class="logo-container">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
+                        alt="Logo" class="logo">
+                    <h1 class="login-title">DataProcessor Pro</h1>
+                    <p class="login-subtitle">Advanced Data Processing Platform</p>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <input type="email" id="email" class="form-input" placeholder="Email Address" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" class="form-input" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="login-btn">
+                        <span id="loginText">Sign In</span>
+                        <div id="loginSpinner" class="spinner hidden"
+                            style="width: 20px; height: 20px; border-width: 2px;"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="dashboard" class="dashboard">
+            <nav class="navbar">
+                <div class="nav-logo">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
+                        alt="Logo" class="nav-logo-icon">
+                    DataProcessor Pro
+                </div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-item" data-section="overview">Dashboard</a>
+                    <a href="#" class="nav-item active" data-section="test-process">Test Process</a>
+                    <a href="#" class="nav-item" data-section="job-history">Job History</a>
+                </div>
+                <div class="profile-menu">
+                    <button class="profile-btn" id="profileBtn">
+                        <span id="profileInitial">U</span>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-info">
+                            <strong>Users Name:</strong> <span id="userName">User Name</span>
+                        </div>
+                        <div class="profile-info">
+                            <strong>Email:</strong> <span id="userEmail">user@email.com</span>
+                        </div>
+                        <div class="profile-info">
+                            <strong>Role:</strong> <span id="userRole">User</span>
+                        </div>
+                        <button class="logout-btn" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="main-content">
+                <section id="overview" class="section">
+                    <h2 class="section-title">Dashboard Overview</h2>
+                    <p style="color: white;">Welcome to your dashboard.</p>
+                </section>
+
+                <section id="test-process" class="section active">
+                    <h2 class="section-title">Test Process</h2>
+
+                    <div class="progress-container">
+                        <div class="progress-steps">
+                            <div class="step active" data-step="1">
+                                <div class="step-circle">1</div>
+                                <div class="step-label">Job & File</div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-circle">2</div>
+                                <div class="step-label">Preview</div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-circle">3</div>
+                                <div class="step-label">Prompt</div>
+                            </div>
+                            <div class="step" data-step="4">
+                                <div class="step-circle">4</div>
+                                <div class="step-label">Mapping</div>
+                            </div>
+                            <div class="step" data-step="5">
+                                <div class="step-circle">5</div>
+                                <div class="step-label">Credentials</div>
+                            </div>
+                            <div class="step" data-step="6">
+                                <div class="step-circle">6</div>
+                                <div class="step-label">Overview</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-step active" data-step="1">
+                        <div class="form-group">
+                            <label for="jobTitle" class="form-label">Job Title</label>
+                            <input type="text" id="jobTitle" class="form-input"
+                                placeholder="e.g., Analyze Customer Feedback" maxlength="30" required>
+                            <div id="jobTitleError" class="form-error">Job Title is required.</div>
+                        </div>
+                        <div class="file-upload" id="fileUploadArea">
+                            <div class="upload-icon">📁</div>
+                            <h3 style="color: white; margin-bottom: 0.5rem;">Upload your CSV or Excel file</h3>
+                            <p style="color: rgba(255, 255, 255, 0.8);">Drag and drop your file here or click to browse
+                            </p>
+                            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display: none;">
+                        </div>
+                        <div id="fileInfo" class="hidden"
+                            style="color: white; margin-top: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                        </div>
+                        <div id="fileError" class="form-error">A file is required.</div>
+                        <div class="form-navigation">
+                            <button class="btn btn-primary" id="tp_next_1" disabled>Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step" data-step="2">
+                        <h3 style="color: white; margin-bottom: 1rem;">Data Preview (Top 20 Rows)</h3>
+                        <div id="dataPreviewContainer" class="data-table-container">
+                            <div class="loading" id="previewLoading">
+                                <div class="spinner"></div>
+                                <p>Parsing file and generating preview...</p>
+                            </div>
+                        </div>
+                        <div class="form-navigation">
+                            <button class="btn btn-secondary" id="tp_prev_2">Previous</button>
+                            <button class="btn btn-primary" id="tp_next_2">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step" data-step="3">
+                        <div class="form-group">
+                            <label for="prompt" class="form-label">Prompt</label>
+                            <textarea id="prompt" class="form-textarea" rows="8"
+                                placeholder="Enter your prompt here. Use {{column_name}} for placeholders."></textarea>
+                            <div id="promptError" class="form-error">Prompt cannot be empty.</div>
+                        </div>
+                        <div class="form-navigation">
+                            <button class="btn btn-secondary" id="tp_prev_3">Previous</button>
+                            <button class="btn btn-primary" id="tp_next_3">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step" data-step="4">
+                        <h3 style="color: white; margin-bottom: 1rem;">Map Placeholders to Columns</h3>
+                        <div id="mappingContainer" class="data-table-container"></div>
+                        <div id="mappingError" class="form-error">Please map all placeholders.</div>
+
+                        <h3 style="color: white; margin: 2rem 0 1rem;">Optional Mapping</h3>
+                        <div class="form-group">
+                            <label for="uniqueId" class="form-label">Unique ID Column (Optional)</label>
+                            <select id="uniqueId" class="form-select"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="outputJson" class="form-label">JSON Object (Optional)</label>
+                            <textarea id="outputJson" class="form-textarea" rows="4"
+                                placeholder='e.g., { "key": "value" }'></textarea>
+                            <div id="jsonError" class="form-error">Please enter a valid JSON object or leave it empty.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="chunkSize" class="form-label">Chunk Size</label>
+                            <div class="slider-group">
+                                <div class="slider-container">
+                                    <input type="range" class="slider" id="chunkSize" min="1" max="100" value="20"
+                                        step="10">
+                                </div>
+                                <input type="number" id="chunkSizeInput" class="form-input slider-value-input"
+                                    value="20" min="1" max="100">
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button class="btn btn-secondary" id="tp_prev_4">Previous</button>
+                            <button class="btn btn-primary" id="tp_next_4">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step" data-step="5">
+                        <h3 style="color: white; margin-bottom: 1rem;">Credentials</h3>
+                        <div class="form-group">
+                            <label for="endpoint" class="form-label">Endpoint URL</label>
+                            <input type="url" id="endpoint" class="form-input" placeholder="https://your-endpoint.com"
+                                required>
+                            <div id="endpointError" class="form-error">Please enter a valid URL.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="apiKey" class="form-label">API Key</label>
+                            <input type="password" id="apiKey" class="form-input" placeholder="••••••••••••••••"
+                                required>
+                            <div id="apiKeyError" class="form-error">API Key is required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="deploymentName" class="form-label">Deployment Name</label>
+                            <input type="text" id="deploymentName" class="form-input" placeholder="e.g., gpt-4-turbo"
+                                required>
+                            <div id="deploymentNameError" class="form-error">Deployment Name is required.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="temperature" class="form-label">Temperature</label>
+                            <input type="number" id="temperature" class="form-input" placeholder="e.g., 0.3" min="0"
+                                max="2" step="0.1" value="0.3">
+                            <div id="temperatureError" class="form-error">Temperature must be between 0 and 2.</div>
+                        </div>
+                        <div class="form-navigation">
+                            <button class="btn btn-secondary" id="tp_prev_5">Previous</button>
+                            <button class="btn btn-primary" id="tp_next_5">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step" data-step="6">
+                        <h3 style="color: white; margin-bottom: 1rem;">Overview & Confirmation</h3>
+                        <div id="summaryContainer" class="job-card" style="cursor: default;"></div>
+                        <div id="processingResult" class="hidden"
+                            style="margin-top: 2rem; text-align: center; color: white;"></div>
+                        <div class="form-navigation" id="overviewButtons">
+                            <button class="btn btn-secondary" id="tp_prev_6">Previous</button>
+                            <button class="btn btn-primary" id="startProcessingBtn"
+                                style="font-size: 1.2rem; padding: 1rem 2rem;">Start Processing</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="test-process-result" class="section">
+                    <h2 class="section-title">Test Process Result</h2>
+                    <div id="resultDisplayContainer"></div>
+                </section>
+
+                <section id="job-history" class="section">
+                    <h2 class="section-title">Job History</h2>
+                    <div id="job-history-container">
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <div id="jobDetailModal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
+            <h2 id="modalJobTitle" class="modal-title">Job Details</h2>
+            <div id="modalDetailsGrid" class="modal-details-grid">
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- CONFIGURATION ---
+            const API_BASE_URL = 'http://127.0.0.1:8000';
+            const LOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
+            const VALIDATE_TOKEN_ENDPOINT = `${API_BASE_URL}/auth/validate-access-token/`;
+            const TEST_PROCESS_ENDPOINT = `${API_BASE_URL}/test-job/process/test-prompt/`;
+            const JOB_HISTORY_ENDPOINT = `${API_BASE_URL}/job/history/test-job/`;
+            const DELETE_JOB_ENDPOINT = `${API_BASE_URL}/job/delete/test-job/`;
+
+            // --- STATE MANAGEMENT ---
+            let currentUser = null;
+
+            const testProcessState = {
+                jobTitle: null,
+                file: null,
+                columns: [],
+                totalRows: 0,
+                previewData: [],
+                prompt: null,
+                placeholders: [],
+                mappings: {},
+                uniqueIdField: null,
+                outputJson: null,
+                isProcessing: false, // <-- FIX: Added processing flag
+                config: {
+                    chunkSize: 20
+                },
+                credentials: {
+                    endpoint: null,
+                    apiKey: null,
+                    deploymentName: null,
+                    temperature: 0.3
+                }
+            };
+
+            const jobHistoryState = {
+                jobs: [],
+                isLoading: false,
+                error: null,
+                hasFetched: false // To prevent re-fetching on every click
+            };
+
+            // --- DOM ELEMENTS ---
+            const DOMElements = {
+                loginScreen: document.getElementById('loginScreen'),
+                dashboard: document.getElementById('dashboard'),
+                loginForm: document.getElementById('loginForm'),
+                loginText: document.getElementById('loginText'),
+                loginSpinner: document.getElementById('loginSpinner'),
+                profileBtn: document.getElementById('profileBtn'),
+                profileDropdown: document.getElementById('profileDropdown'),
+                profileMenu: document.querySelector('.profile-menu'),
+                logoutBtn: document.getElementById('logoutBtn'),
+                profileInitial: document.getElementById('profileInitial'),
+                userName: document.getElementById('userName'),
+                userEmail: document.getElementById('userEmail'),
+                userRole: document.getElementById('userRole')
+            };
+
+            // --- UTILITY FUNCTIONS ---
+            const formatFileSize = (bytes) => {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+            };
+
+            const showToast = (message, type = 'info') => {
+                const toastContainer = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.textContent = message;
+                toastContainer.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.addEventListener('transitionend', () => toast.remove());
+                }, 3000);
+            };
+
+            const downloadBase64File = (base64Data, fileName) => {
+                const linkSource = `data:text/csv;base64,${base64Data}`;
+                const downloadLink = document.createElement("a");
+                downloadLink.href = linkSource;
+                downloadLink.download = fileName;
+                downloadLink.click();
+            };
+
+            const showError = (elementId, message) => {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            };
+
+            const hideError = (elementId) => {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            };
+
+            // --- ROUTING & NAVIGATION ---
+            const switchSection = (sectionName, param = null) => {
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                const activeNavItem = document.querySelector(`.nav-item[data-section="${sectionName}"]`);
+                if (activeNavItem) activeNavItem.classList.add('active');
+
+                document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+                const targetSection = document.getElementById(sectionName.split('/')[0]);
+                if (targetSection) targetSection.classList.add('active');
+
+                // Handle specific section logic
+                if (sectionName === 'job-history' && !jobHistoryState.hasFetched) {
+                    fetchJobHistory();
+                }
+
+                if (sectionName === 'test-process' && param === 'result') {
+                    document.getElementById('test-process').classList.remove('active');
+                    document.getElementById('test-process-result').classList.add('active');
+                    displayStoredResult();
+                } else if (sectionName === 'test-process') {
+                    document.getElementById('test-process-result').classList.remove('active');
+                }
+
+                if (sectionName !== 'test-process/result') {
+                    window.history.pushState({ sectionName, param }, '', `#/${sectionName}${param ? `/${param}` : ''}`);
+                }
+            };
+
+            const handleRouting = () => {
+                const hash = window.location.hash.slice(2);
+                const [section, param] = hash.split('/');
+
+                if (currentUser) {
+                    switchSection(section || 'test-process', param);
+                } else {
+                    DOMElements.loginScreen.style.display = 'flex';
+                    DOMElements.dashboard.style.display = 'none';
+                }
+            };
+
+            // --- AUTHENTICATION ---
+            const login = async (email, password) => {
+                DOMElements.loginText.style.display = 'none';
+                DOMElements.loginSpinner.classList.remove('hidden');
+
+                try {
+                    const response = await fetch(`${LOGIN_ENDPOINT}/${encodeURIComponent(email)}/${encodeURIComponent(password)}`);
+                    const data = await response.json();
+
+                    if (!response.ok || data.status_code !== 200) {
+                        throw new Error(data.message || 'Login failed');
+                    }
+
+                    currentUser = data;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showDashboard();
+                    switchSection('test-process');
+
+                } catch (error) {
+                    showToast(error.message, 'error');
+                } finally {
+                    DOMElements.loginText.style.display = 'inline';
+                    DOMElements.loginSpinner.classList.add('hidden');
+                }
+            };
+
+            const logout = (message) => {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                window.location.hash = '';
+                DOMElements.loginScreen.style.display = 'flex';
+                DOMElements.dashboard.style.display = 'none';
+                if (message) {
+                    setTimeout(() => showToast(message, 'info'), 100);
+                }
+            };
+
+            const showDashboard = () => {
+                DOMElements.loginScreen.style.display = 'none';
+                DOMElements.dashboard.style.display = 'block';
+                DOMElements.userName.textContent = `${currentUser.first_name} ${currentUser.last_name}`;
+                DOMElements.profileInitial.textContent = (currentUser.first_name[0] + currentUser.last_name[0]).toUpperCase();
+                DOMElements.userEmail.textContent = currentUser.email;
+                DOMElements.userRole.textContent = currentUser.role;
+            };
+
+            const checkSession = async () => {
+                const userString = localStorage.getItem('currentUser');
+                if (!userString) {
+                    handleRouting();
+                    return;
+                }
+
+                const storedUser = JSON.parse(userString);
+                if (!storedUser.user_id || !storedUser.access_token) {
+                    logout();
+                    return;
+                }
+
+                try {
+                    const url = new URL(VALIDATE_TOKEN_ENDPOINT);
+                    url.searchParams.append('user_id', storedUser.user_id);
+                    url.searchParams.append('access_token', storedUser.access_token);
+
+                    const response = await fetch(url.toString());
+
+                    if (!response.ok) {
+                        logout("Token expired. Please log in again.");
+                        return;
+                    }
+
+                    const validatedUser = await response.json();
+                    currentUser = validatedUser;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showDashboard();
+                    handleRouting();
+
+                } catch (error) {
+                    console.error("Session validation failed:", error);
+                    logout("Session could not be verified. Please log in again.");
+                }
+            };
+
+            // --- TEST PROCESS LOGIC ---
+            const testProcessManager = {
+                currentStep: 1,
+
+                goToStep(step) {
+                    this.currentStep = step;
+                    document.querySelectorAll('#test-process .step').forEach((s, i) => {
+                        s.classList.remove('active', 'completed');
+                        if (i + 1 < step) s.classList.add('completed');
+                        if (i + 1 === step) s.classList.add('active');
+                    });
+                    document.querySelectorAll('#test-process .form-step').forEach(fs => {
+                        fs.classList.remove('active');
+                        if (parseInt(fs.dataset.step) === step) fs.classList.add('active');
+                    });
+
+                    if (step === 1) this.setupStep1();
+                    if (step === 2) this.setupStep2();
+                    if (step === 3) this.setupStep3();
+                    if (step === 4) this.setupStep4();
+                    if (step === 5) this.setupStep5();
+                    if (step === 6) this.setupStep6();
+                },
+
+                // Step 1: Job & File
+                setupStep1() {
+                    this.validateStep1();
+                },
+
+                validateStep1() {
+                    const jobTitleInput = document.getElementById('jobTitle');
+                    const nextBtn = document.getElementById('tp_next_1');
+                    const isTitleValid = jobTitleInput.value.trim().length > 0;
+                    const isFileValid = !!testProcessState.file;
+
+                    isTitleValid ? hideError('jobTitleError') : showError('jobTitleError', 'Job Title is required.');
+                    isFileValid ? hideError('fileError') : showError('fileError', 'A file is required.');
+                    const isValid = isTitleValid && isFileValid;
+                    nextBtn.disabled = !isValid;
+                    return isValid;
+                },
+
+                // Step 2: Preview
+                async setupStep2() {
+                    const previewContainer = document.getElementById('dataPreviewContainer');
+                    const nextBtn = document.getElementById('tp_next_2');
+                    nextBtn.disabled = true;
+
+                    // If preview data already exists in state, just render it. No loader needed.
+                    if (testProcessState.previewData.length > 0) {
+                        this.renderPreviewTable(previewContainer);
+                        nextBtn.disabled = false;
+                        return;
+                    }
+
+                    const loading = document.getElementById('previewLoading');
+                    loading.style.display = 'block';
+                    previewContainer.innerHTML = '';
+                    previewContainer.appendChild(loading);
+
+                    try {
+                        const data = await this.parseFile(testProcessState.file);
+                        testProcessState.columns = data.headers;
+                        testProcessState.previewData = data.rows;
+                        testProcessState.totalRows = data.totalRows;
+                        this.renderPreviewTable(previewContainer);
+                        nextBtn.disabled = false;
+                    } catch (error) {
+                        previewContainer.innerHTML = `<p style="color: #ffcdd2;">Error parsing file: ${error.message}</p>`;
+                    }
+                },
+
+                renderPreviewTable(container) {
+                    const table = document.createElement('table');
+                    table.className = 'data-table';
+                    table.innerHTML = `
+                    <thead><tr>${testProcessState.columns.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                    <tbody>${testProcessState.previewData.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+                `;
+                    container.innerHTML = '';
+                    container.appendChild(table);
+                },
+
+                parseFile(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                let workbook;
+                                if (file.name.toLowerCase().endsWith('.csv')) {
+                                    const text = e.target.result;
+                                    workbook = XLSX.read(text, { type: 'string' });
+                                } else {
+                                    const data = new Uint8Array(e.target.result);
+                                    workbook = XLSX.read(data, { type: 'array' });
+                                }
+
+                                const sheetName = workbook.SheetNames[0];
+                                const worksheet = workbook.Sheets[sheetName];
+                                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+
+                                if (json.length === 0) return reject(new Error('File is empty.'));
+
+                                let headers = json[0];
+                                headers = headers.map(header =>
+                                    typeof header === 'string' ? header.replace(/^\uFEFF/, '').trim() : header
+                                );
+
+                                const rows = json.slice(1, 21);
+                                resolve({ headers, rows, totalRows: json.length - 1 });
+                            } catch (err) {
+                                console.error("Parsing Error:", err);
+                                reject(err);
+                            }
+                        };
+                        reader.onerror = reject;
+
+                        if (file.name.toLowerCase().endsWith('.csv')) {
+                            reader.readAsText(file);
+                        } else {
+                            reader.readAsArrayBuffer(file);
+                        }
+                    });
+                },
+
+                // Step 3: Prompt
+                setupStep3() {
+                    this.validateStep3();
+                },
+
+                validateStep3() {
+                    const promptInput = document.getElementById('prompt');
+                    const nextBtn = document.getElementById('tp_next_3');
+                    const isValid = promptInput.value.trim().length > 0;
+                    isValid ? hideError('promptError') : showError('promptError', 'Prompt cannot be empty.');
+                    nextBtn.disabled = !isValid;
+                    return isValid;
+                },
+
+                // Step 4: Mapping
+                setupStep4() {
+                    const mappingContainer = document.getElementById('mappingContainer');
+                    const uniqueIdSelect = document.getElementById('uniqueId');
+
+                    const columnOptions = `<option value="">-- Select Column --</option>` + testProcessState.columns.map(c => `<option value="${c}">${c}</option>`).join('');
+                    uniqueIdSelect.innerHTML = `<option value="">None</option>` + columnOptions;
+
+                    if (testProcessState.placeholders.length > 0) {
+                        const table = document.createElement('table');
+                        table.className = 'data-table';
+                        table.innerHTML = `<thead><tr><th>Placeholder</th><th>Column Name</th></tr></thead><tbody>
+                         ${testProcessState.placeholders.map(p => `
+                             <tr>
+                                 <td>{{${p}}}</td>
+                                 <td><select class="form-select mapping-select" data-placeholder="${p}">${columnOptions}</select></td>
+                             </tr>
+                         `).join('')}
+                     </tbody>`;
+                        mappingContainer.innerHTML = '';
+                        mappingContainer.appendChild(table);
+                        // Re-attach listeners to newly created elements
+                        document.querySelectorAll('.mapping-select').forEach(el => el.addEventListener('input', () => this.validateStep4()));
+                    } else {
+                        mappingContainer.innerHTML = `<p style="color: white;">No placeholders found in the prompt.</p>`;
+                    }
+
+                    this.validateStep4();
+                },
+
+                validateStep4() {
+                    const nextBtn = document.getElementById('tp_next_4');
+                    const outputJsonInput = document.getElementById('outputJson');
+
+                    let allMapped = true;
+                    document.querySelectorAll('.mapping-select').forEach(sel => {
+                        if (!sel.value) allMapped = false;
+                    });
+                    allMapped ? hideError('mappingError') : showError('mappingError', 'Please map all placeholders.');
+
+                    let isJsonValid = true;
+                    if (outputJsonInput.value.trim()) {
+                        try {
+                            JSON.parse(outputJsonInput.value);
+                            hideError('jsonError');
+                        } catch (e) {
+                            isJsonValid = false;
+                            showError('jsonError', 'Invalid JSON format.');
+                        }
+                    } else {
+                        hideError('jsonError');
+                    }
+
+                    const isValid = allMapped && isJsonValid;
+                    nextBtn.disabled = !isValid;
+                    return isValid;
+                },
+
+                // Step 5: Credentials
+                setupStep5() {
+                    this.validateStep5();
+                },
+
+                validateStep5() {
+                    const nextBtn = document.getElementById('tp_next_5');
+                    const fields = [
+                        { id: 'endpoint', type: 'url', errorId: 'endpointError', msg: 'Please enter a valid URL.' },
+                        { id: 'apiKey', type: 'text', errorId: 'apiKeyError', msg: 'API Key is required.' },
+                        { id: 'deploymentName', type: 'text', errorId: 'deploymentNameError', msg: 'Deployment Name is required.' },
+                        { id: 'temperature', type: 'range', errorId: 'temperatureError', msg: 'Temperature must be between 0 and 2.' }
+                    ];
+                    let allValid = true;
+                    fields.forEach(field => {
+                        const input = document.getElementById(field.id);
+                        let isValid = false;
+                        if (field.type === 'url') {
+                            try { new URL(input.value); isValid = true; } catch (e) { isValid = false; }
+                        } else if (field.type === 'range') {
+                            const val = parseFloat(input.value);
+                            isValid = !isNaN(val) && val >= 0 && val <= 2;
+                        } else {
+                            isValid = input.value.trim().length > 0;
+                        }
+
+                        isValid ? hideError(field.errorId) : showError(field.errorId, field.msg);
+                        if (!isValid) allValid = false;
+                    });
+                    nextBtn.disabled = !allValid;
+                    return allValid;
+                },
+
+                // Step 6: Overview
+                setupStep6() {
+                    const summaryContainer = document.getElementById('summaryContainer');
+                    summaryContainer.innerHTML = `
+                    <p><strong>Job Title:</strong> ${testProcessState.jobTitle}</p>
+                    <p><strong>File Name:</strong> ${testProcessState.file.name}</p>
+                    <p><strong>File Size:</strong> ${formatFileSize(testProcessState.file.size)}</p>
+                    <p><strong>Total Rows:</strong> ${testProcessState.totalRows.toLocaleString()}</p>
+                    <p><strong>Chunk Size:</strong> ${testProcessState.config.chunkSize}</p>
+                `;
+                    // <-- FIX: Ensure the processing/result UI is hidden and buttons are shown when returning to this step.
+                    document.getElementById('processingResult').classList.add('hidden');
+                    document.getElementById('overviewButtons').classList.remove('hidden');
+                },
+
+                // API Submission
+                async startProcessing() {
+                    if (!confirm('Are you sure you want to start processing?')) return;
+
+                    testProcessState.isProcessing = true; // <-- FIX: Set processing flag
+                    const overviewButtons = document.getElementById('overviewButtons');
+                    const resultDiv = document.getElementById('processingResult');
+                    overviewButtons.classList.add('hidden');
+                    resultDiv.classList.remove('hidden');
+                    resultDiv.innerHTML = `<div class="loading"><div class="spinner"></div><p>Submitting job to API...</p></div>`;
+
+                    const descriptionPayload = {
+                        job_title: testProcessState.jobTitle,
+                        prompt: testProcessState.prompt,
+                        placeholder_field: testProcessState.mappings,
+                        unique_id_field: testProcessState.uniqueIdField,
+                        output_field: testProcessState.outputJson,
+                        config: { "chunkSize": parseInt(document.getElementById('chunkSizeInput').value) },
+                        credentials: testProcessState.credentials
+                    };
+
+                    const formData = new FormData();
+                    formData.append('file', testProcessState.file);
+                    formData.append('description', JSON.stringify(descriptionPayload));
+
+                    const url = new URL(TEST_PROCESS_ENDPOINT);
+                    url.searchParams.append('user_id', currentUser.user_id);
+                    url.searchParams.append('access_token', currentUser.access_token);
+
+                    try {
+                        const response = await fetch(url.toString(), {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        const responseData = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(responseData.detail || `API Error (${response.status})`);
+                        }
+
+                        sessionStorage.setItem('lastTestResult', JSON.stringify(responseData));
+                        switchSection('test-process', 'result');
+
+                    } catch (error) {
+                        console.error("API Call Failed:", error);
+                        resultDiv.innerHTML = `<p style="color: #ffcdd2;">Error: ${error.message}</p>`;
+                        overviewButtons.classList.remove('hidden');
+                    } finally {
+                        testProcessState.isProcessing = false; // <-- FIX: Reset processing flag
+                    }
+                },
+
+                init() {
+                    // --- Navigation Listeners ---
+                    document.getElementById('tp_next_1').addEventListener('click', () => {
+                        if (this.validateStep1()) {
+                            testProcessState.jobTitle = document.getElementById('jobTitle').value;
+                            // Clear subsequent step data if file or title changes
+                            Object.assign(testProcessState, {
+                                columns: [], previewData: [], totalRows: 0, prompt: null,
+                                placeholders: [], mappings: {}, uniqueIdField: null, outputJson: null
+                            });
+                            this.goToStep(2);
+                        }
+                    });
+
+                    document.getElementById('tp_prev_2').addEventListener('click', () => this.goToStep(1));
+                    document.getElementById('tp_next_2').addEventListener('click', () => this.goToStep(3));
+
+                    document.getElementById('tp_prev_3').addEventListener('click', () => this.goToStep(2));
+                    document.getElementById('tp_next_3').addEventListener('click', () => {
+                        if (this.validateStep3()) {
+                            testProcessState.prompt = document.getElementById('prompt').value;
+                            const placeholderRegex = /{{\s*(\w+)\s*}}/g;
+                            testProcessState.placeholders = [...new Set(Array.from(testProcessState.prompt.matchAll(placeholderRegex), m => m[1]))];
+                            this.goToStep(4);
+                        }
+                    });
+
+                    document.getElementById('tp_prev_4').addEventListener('click', () => this.goToStep(3));
+                    document.getElementById('tp_next_4').addEventListener('click', () => {
+                        if (this.validateStep4()) {
+                            testProcessState.mappings = {};
+                            document.querySelectorAll('.mapping-select').forEach(sel => {
+                                testProcessState.mappings[sel.dataset.placeholder] = sel.value;
+                            });
+                            testProcessState.uniqueIdField = document.getElementById('uniqueId').value || null;
+                            const outputJsonValue = document.getElementById('outputJson').value.trim();
+                            testProcessState.outputJson = outputJsonValue ? JSON.parse(outputJsonValue) : null;
+                            testProcessState.config.chunkSize = parseInt(document.getElementById('chunkSizeInput').value);
+                            this.goToStep(5);
+                        }
+                    });
+
+                    document.getElementById('tp_prev_5').addEventListener('click', () => this.goToStep(4));
+                    document.getElementById('tp_next_5').addEventListener('click', () => {
+                        if (this.validateStep5()) {
+                            testProcessState.credentials.endpoint = document.getElementById('endpoint').value;
+                            testProcessState.credentials.apiKey = document.getElementById('apiKey').value;
+                            testProcessState.credentials.deploymentName = document.getElementById('deploymentName').value;
+                            testProcessState.credentials.temperature = parseFloat(document.getElementById('temperature').value);
+                            this.goToStep(6);
+                        }
+                    });
+
+                    document.getElementById('tp_prev_6').addEventListener('click', () => {
+                        testProcessState.isProcessing = false; // <-- FIX: Reset flag when navigating back
+                        this.goToStep(5);
+                    });
+                    document.getElementById('startProcessingBtn').addEventListener('click', () => this.startProcessing());
+
+                    // --- Input Validation & Control Listeners ---
+                    const fileInput = document.getElementById('fileInput');
+                    const fileUploadArea = document.getElementById('fileUploadArea');
+                    const chunkSizeSlider = document.getElementById('chunkSize');
+                    const chunkSizeInput = document.getElementById('chunkSizeInput');
+
+                    document.getElementById('jobTitle').addEventListener('input', () => this.validateStep1());
+                    const handleFile = (files) => {
+                        if (files.length > 0) {
+                            testProcessState.file = files[0];
+                            document.getElementById('fileInfo').innerHTML = `<strong>File:</strong> ${testProcessState.file.name} | <strong>Size:</strong> ${formatFileSize(testProcessState.file.size)}`;
+                            document.getElementById('fileInfo').classList.remove('hidden');
+                            this.validateStep1();
+                        }
+                    };
+                    fileUploadArea.addEventListener('click', () => fileInput.click());
+                    fileUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); fileUploadArea.classList.add('drag-over'); });
+                    fileUploadArea.addEventListener('dragleave', () => fileUploadArea.classList.remove('drag-over'));
+                    fileUploadArea.addEventListener('drop', (e) => { e.preventDefault(); fileUploadArea.classList.remove('drag-over'); handleFile(e.dataTransfer.files); });
+                    fileInput.addEventListener('change', (e) => handleFile(e.target.files));
+
+                    document.getElementById('prompt').addEventListener('input', () => this.validateStep3());
+                    document.getElementById('outputJson').addEventListener('input', () => this.validateStep4());
+                    chunkSizeSlider.addEventListener('input', () => { chunkSizeInput.value = chunkSizeSlider.value; this.validateStep4(); });
+                    chunkSizeInput.addEventListener('input', () => { chunkSizeSlider.value = chunkSizeInput.value; this.validateStep4(); });
+
+                    ['endpoint', 'apiKey', 'deploymentName', 'temperature'].forEach(id => {
+                        document.getElementById(id).addEventListener('input', () => this.validateStep5());
+                    });
+
+                    this.setupStep1();
+                }
+            };
+
+            const displayStoredResult = () => {
+                const result = sessionStorage.getItem('lastTestResult');
+                const container = document.getElementById('resultDisplayContainer');
+                if (result) {
+                    const data = JSON.parse(result);
+
+                    const summaryHtml = `
+                    <div class="result-summary-grid">
+                        <div class="summary-card">
+                            <div class="summary-card-title">Rows Processed</div>
+                            <div class="summary-card-value">${data.total_test_rows_processed.toLocaleString()}</div>
+                        </div>
+                         <div class="summary-card">
+                            <div class="summary-card-title">Avg. Input Tokens</div>
+                            <div class="summary-card-value">${data.average_input_token.toFixed(2)}</div>
+                        </div>
+                         <div class="summary-card">
+                            <div class="summary-card-title">Avg. Output Tokens</div>
+                            <div class="summary-card-value">${data.average_completion_token.toFixed(2)}</div>
+                        </div>
+                         <div class="summary-card">
+                            <div class="summary-card-title">Avg. Total Tokens</div>
+                            <div class="summary-card-value">${data.average_total_token.toFixed(2)}</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-card-title">Avg. Cost / Row</div>
+                            <div class="summary-card-value">$${data.average_cost_per_row.toFixed(8)}</div>
+                        </div>
+                    </div>
+                `;
+
+                    let tableHtml = '<h3>Row Preview Data</h3>';
+                    if (data.row_preview_data && data.row_preview_data.length > 0) {
+                        const headers = Object.keys(data.row_preview_data[0]);
+                        tableHtml += `
+                        <div class="data-table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>${headers.map(h => `<th>${h.replace(/_/g, ' ')}</th>`).join('')}</tr>
+                                </thead>
+                                <tbody>
+                                    ${data.row_preview_data.map(row => `
+                                        <tr>
+                                            ${headers.map(header => {
+                            let cellData = row[header];
+                            if (Array.isArray(cellData)) {
+                                cellData = `<ul>${cellData.map(item => `<li>${item}</li>`).join('')}</ul>`;
+                            }
+                            return `<td>${cellData}</td>`;
+                        }).join('')}
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    }
+
+                    container.innerHTML = `
+                    <div class="result-container">
+                        ${summaryHtml}
+                        ${tableHtml}
+                        <div class="form-navigation" style="text-align: center; margin-top: 2rem;">
+                             <button class="btn btn-primary" id="downloadCsvBtn">Download Results as CSV</button>
+                        </div>
+                    </div>
+                `;
+
+                    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+                        // downloadBase64File(data.file_data, `test_results_${Date.now()}.csv`);
+                        downloadBase64File(data.file_data, `test_results_${data.job_title}.csv`);
+                    });
+
+                } else {
+                    container.innerHTML = `<p>No result found. Please try submitting a job.</p>`;
+                }
+            };
+
+            // --- JOB HISTORY LOGIC ---
+            const fetchJobHistory = async () => {
+                jobHistoryState.isLoading = true;
+                jobHistoryState.hasFetched = true;
+                renderJobHistory();
+
+                const url = new URL(JOB_HISTORY_ENDPOINT);
+                url.searchParams.append('user_id', currentUser.user_id);
+                url.searchParams.append('access_token', currentUser.access_token);
+
+                try {
+                    const response = await fetch(url.toString());
+                    const data = await response.json();
+
+                    if (response.status === 404) {
+                        jobHistoryState.jobs = [];
+                        jobHistoryState.error = data.message;
+                    } else if (!response.ok) {
+                        throw new Error(data.message || 'Failed to fetch job history');
+                    } else {
+                        jobHistoryState.jobs = data.jobs || [];
+                        jobHistoryState.error = null;
+                    }
+                } catch (error) {
+                    jobHistoryState.error = error.message;
+                    showToast(error.message, 'error');
+                } finally {
+                    jobHistoryState.isLoading = false;
+                    renderJobHistory();
+                }
+            };
+
+            const renderJobHistory = () => {
+                const container = document.getElementById('job-history-container');
+                if (!container) return;
+
+                if (jobHistoryState.isLoading) {
+                    container.innerHTML = `<div class="loading" style="grid-column: 1 / -1;"><div class="spinner"></div><p>Fetching job history...</p></div>`;
+                    return;
+                }
+
+                if (jobHistoryState.jobs.length === 0) {
+                    container.innerHTML = `
+                    <div class="no-jobs-message" style="grid-column: 1 / -1;">
+                        <div class="no-jobs-icon">🗂️</div>
+                        <p class="no-jobs-text">No job history found.</p>
+                        <p style="opacity: 0.6;">Create a new job in the 'Test Process' section!</p>
+                    </div>
+                `;
+                    return;
+                }
+
+                container.innerHTML = jobHistoryState.jobs.map(job => `
+                    <div class="job-card" data-job-id="${job.id}">
+                        <button class="job-delete-btn" data-job-id="${job.id}" data-job-title="${job.job_title}" title="Delete Job">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#A30000" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                            </svg>
+                        </button>
+                        <h3 class="job-card-title">${job.job_title}</h3>
+                        <p class="job-card-detail"><strong>File:</strong> ${job.file_name}</p>
+                        <p class="job-card-detail"><strong>Created:</strong> ${new Date(job.created_at).toLocaleString()}</p>
+                        <span class="job-card-status ${job.status}">${job.status}</span>
+                    </div>
+                `).join('');
+
+
+                // Add event listeners
+                container.querySelectorAll('.job-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (!e.target.closest('.job-delete-btn')) { // Prevent modal opening on delete click
+                            openJobDetailModal(card.dataset.jobId);
+                        }
+                    });
+                });
+
+                container.querySelectorAll('.job-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent card click event from firing
+                        const jobId = btn.dataset.jobId;
+                        const jobTitle = btn.dataset.jobTitle;
+                        if (confirm(`Are you sure you want to delete the job "${jobTitle}"? This action cannot be undone.`)) {
+                            deleteJob(jobId, jobTitle);
+                        }
+                    });
+                });
+            };
+
+            const deleteJob = async (jobId, jobTitle) => {
+                const url = new URL(DELETE_JOB_ENDPOINT);
+                url.searchParams.append('user_id', currentUser.user_id);
+                url.searchParams.append('job_id', jobId);
+                url.searchParams.append('access_token', currentUser.access_token);
+
+                try {
+                    const response = await fetch(url.toString(), { method: 'DELETE' });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Failed to delete job');
+                    }
+
+                    showToast(`Job "${jobTitle}" was deleted successfully.`, 'success');
+                    // Refresh job history list
+                    await fetchJobHistory();
+
+                } catch (error) {
+                    showToast(error.message, 'error');
+                }
+            };
+
+            const openJobDetailModal = (jobId) => {
+                const job = jobHistoryState.jobs.find(j => j.id === jobId);
+                if (!job) return;
+
+                const modal = document.getElementById('jobDetailModal');
+                const title = document.getElementById('modalJobTitle');
+                const grid = document.getElementById('modalDetailsGrid');
+
+                title.textContent = job.job_title;
+
+                const details = {
+                    // '🆔 Job ID': job.id,
+                    // '👤 User ID': job.user_id,
+                    '📄 File Name': job.file_name,
+                    '📊 Status': `<span class="job-card-status ${job.status}" style="display:inline-block; margin:0;">${job.status}</span>`,
+                    '🔢 Rows Processed': job.total_rows_processed.toLocaleString(),
+                    '🤖 Model': job.model,
+                    '📥 Avg. Input Tokens': job.avg_input_token.toFixed(1),
+                    '📤 Avg. Output Tokens': job.avg_completion_token.toFixed(1),
+                    '🔄 Avg. Total Tokens': job.avg_total_token.toFixed(1),
+                    '💲 Avg. Cost / Row': `$${job.avg_cost_per_row.toPrecision(4)}`,
+                    '✍️ Prompt Used': job.prompt,
+                    '🕒 Created At': new Date(job.created_at).toLocaleString(),
+                    // '🔄 Updated At': new Date(job.updated_at).toLocaleString(),
+                };
+
+                grid.innerHTML = Object.entries(details).map(([label, value]) => `
+                <div class="modal-detail-item">
+                    <div class="modal-detail-label">${label}</div>
+                    <div class="modal-detail-value">${value}</div>
+                </div>
+            `).join('');
+
+                modal.classList.add('show');
+            };
+
+            const closeJobDetailModal = () => {
+                document.getElementById('jobDetailModal').classList.remove('show');
+            };
+
+
+            // --- INITIALIZATION ---
+            DOMElements.loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                login(document.getElementById('email').value, document.getElementById('password').value);
+            });
+
+            DOMElements.profileBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                DOMElements.profileDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!DOMElements.profileMenu.contains(event.target)) {
+                    DOMElements.profileDropdown.classList.remove('show');
+                }
+            });
+
+            DOMElements.logoutBtn.addEventListener('click', () => logout());
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchSection(item.dataset.section);
+                });
+            });
+
+            // Modal close listeners
+            document.getElementById('modalCloseBtn').addEventListener('click', closeJobDetailModal);
+            document.getElementById('jobDetailModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeJobDetailModal();
+                }
+            });
+
+
+            window.addEventListener('popstate', handleRouting);
+
+            checkSession();
+            testProcessManager.init();
+
+            // Ensure the button state is correct on load
+            document.getElementById('tp_next_1').disabled = true;
+        });
+    </script>
+</body>
+
+</html>
