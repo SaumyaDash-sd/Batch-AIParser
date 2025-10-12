@@ -116,7 +116,7 @@ def replace_placeholders_with_col_values(
     return df
 
 
-def start_process(dataframe, unique_id_column_name):
+def start_process(dataframe, unique_id_column_name, prompt, placeholder_field):
     df1 = clean_dataframe(dataframe, unique_id_column_name)
     df2 = add_prompt_column(df1, prompt)
     df3 = replace_placeholders_with_col_values(df2, placeholder_field)

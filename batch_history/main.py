@@ -28,8 +28,11 @@ def append_batch_job_history(user_id: str, job_data: dict):
         "file_name": job_data.get("file_name", None),
         "job_type": job_data.get("job_type", None),
         "chunks": job_data.get("chunks", 0),
+        "chunk_size": job_data.get("chunk_size", 0),
         "total_rows_processed": job_data.get("total_rows_processed", 0),
         "model": job_data.get("model", None),
+        "endpoint": job_data.get("endpoint", None),
+        "api_key": job_data.get("api_key", None),
         "prompt": [job_data.get("prompt", None)],
         "created_at": datetime.now().isoformat(),
         "updated_at": datetime.now().isoformat(),
@@ -81,7 +84,7 @@ def append_uploaded_file_history(
         "message": "Upload file history appended successfully",
         "user_id": user_id,
         "job_id": job_id,
-        "file_id": new_job["id"],
+        "file_id": new_job["file_id"],
     }
 
 
@@ -98,7 +101,7 @@ def append_batch_file_history(
         "file_id": file_id,
         "output_file_id": job_data.get("output_file_id", None),
         "job_type": job_data.get("job_type", None),
-        "status": job_data.get("batch_status", "not_started"),
+        "status": job_data.get("batch_status", "validating"),
         "chunk_no": job_data.get("chunk_no", "chunk_1"),
         "total_rows_processed": job_data.get("total_rows_processed", 0),
         "created_at": datetime.now().isoformat(),
@@ -118,7 +121,7 @@ def append_batch_file_history(
         "user_id": user_id,
         "job_id": job_id,
         "file_id": file_id,
-        "batch_id": new_job["id"],
+        "batch_id": new_job["batch_id"],
     }
 
 
@@ -345,6 +348,28 @@ def get_chunk_no_and_row_count(user_id, job_id, file_id):
         return first_row["chunk_no"], first_row["total_rows_processed"]
     else:
         return None, None
+
+
+def get_file_ids_for_user_and_job(user_id, job_id):
+    # Step 1: Read the DataFrame
+    df = read_uploaded_files()
+
+    # Step 2: Create a mask to filter matching rows (not deleted)
+    mask = (
+        (df["user_id"] == user_id)
+        & (df["job_id"] == job_id)
+        & (df["deleted_at"].isna())
+    )
+
+    # Step 3: Filter matching rows
+    filtered = df[mask]
+
+    # Step 4: Return list of file_ids (unique)
+    if not filtered.empty:
+        file_ids = filtered["file_id"].unique().tolist()
+        return file_ids
+    else:
+        return []
 
 
 def get_batch_status_and_output_file_id(user_id, job_id, batch_id):

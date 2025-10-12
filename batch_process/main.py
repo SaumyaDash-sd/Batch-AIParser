@@ -12,11 +12,12 @@ from .steps.batch_status import check_batch_progress
 from batch_history import (
     get_batch_status_and_output_file_id,
     update_batch_status_if_changed,
+    get_file_ids_for_user_and_job,
 )
 
 
 def batch_processing_create_and_upload_file(user_id, filename, df, description_json):
-    output_df = steps.create_file.start_process(df, description_json["unique_id_field"])
+    output_df = steps.create_file.start_process(df, description_json["unique_id_field"], description_json["prompt"], description_json["placeholder_field"])
     uploaded_files_list = steps.upload_file.start_process(
         output_df, filename, description_json
     )
@@ -29,6 +30,8 @@ def batch_processing_create_and_upload_file(user_id, filename, df, description_j
         "chunks": len(uploaded_files_list),
         "total_rows_processed": len(output_df),
         "model": description_json.get("credentials", {}).get("deploymentName", "N/A"),
+        "endpoint": description_json.get("credentials", {}).get("endpoint", "N/A"),
+        "api_key": description_json.get("credentials", {}).get("apiKey", "N/A"),
         "prompt": description_json.get("prompt", None),
     }
     batch_job_data = append_batch_job_history(user_id, job_data)
@@ -45,9 +48,13 @@ def batch_processing_create_and_upload_file(user_id, filename, df, description_j
         )
 
     output_json = convert_df_to_bytes(output_df)
+    output_json["job_id"] = batch_job_data["job_id"]
+    output_json["chunks"] = len(uploaded_files_list)
+    output_json["job_title"] = description_json.get("job_title", None),
     return output_json
 
 
+# Deprecated function, kept for reference for future use
 def batch_processing_upload_file(user_id, filename, df, description_json):
     uploaded_files_list = steps.upload_file.start_process(
         df, filename, description_json
@@ -99,12 +106,35 @@ def start_batch_of_file_ids(user_id, job_id, list_of_file_ids):
     }
 
 
+def start_batch_of_job_id(user_id, job_id):
+    list_of_file_ids = get_file_ids_for_user_and_job(user_id, job_id)
+    batch_files_list = steps.start_batch_job.start_process(
+        user_id, job_id, list_of_file_ids
+    )
+    job_data = {"job_type": "batch-job"}
+    for batch_data in batch_files_list:
+        batch_id = batch_data.get("batch_id", None)
+        file_id = batch_data.get("file_id", None)
+        job_data["status"] = batch_data.get("status")
+        job_data["chunk_no"] = batch_data.get("chunk_no")
+        job_data["total_rows_processed"] = batch_data.get("total_rows_processed")
+        job_data["output_file_id"] = batch_data.get("output_file_id")
+
+        append_batch_file_history(user_id, job_id, file_id, batch_id, job_data)
+    return {
+        "batch_count": len(batch_files_list),
+        "message": f"{len(batch_files_list)} has been started, check progress in batch status tab",
+    }
+
+
 def check_status_of_batch_ids_of_job(user_id, job_id, list_of_batch_ids):
     client = get_openai_client(user_id, job_id)
     if client:
         list_of_all_batch_status = []
         for batch_id in list_of_batch_ids:
-            batch_status = get_batch_status_and_output_file_id(user_id, job_id, batch_id)
+            batch_status = get_batch_status_and_output_file_id(
+                user_id, job_id, batch_id
+            )
             if batch_status["status"] != "completed":
                 current_batch_status = check_batch_progress(client, batch_id)
                 batch_status["status"] = current_batch_status["status"]
@@ -129,4 +159,85 @@ def check_status_of_batch_ids_of_job(user_id, job_id, list_of_batch_ids):
             "user_id": user_id,
             "job_id": job_id,
             "batch_status": [],
+        }
+
+
+def download_input_csv_file_of_file_ids(user_id, job_id, list_of_file_ids):
+    client = get_openai_client(user_id, job_id)
+    if client:
+        list_of_all_input_files_data = []
+        for file_id in list_of_file_ids:
+            dataframe = steps.download_file.download_csv_of_batch_input_file(
+                client, file_id
+            )
+            dataframe_bytes_and_data = convert_df_to_bytes(dataframe)
+            input_file = {
+                "file_id": file_id,
+                "total_test_rows_processed": dataframe_bytes_and_data[
+                    "total_test_rows_processed"
+                ],
+                "row_preview_data": dataframe_bytes_and_data["row_preview_data"],
+                "file_data": dataframe_bytes_and_data["file_data"],
+            }
+            list_of_all_input_files_data.append(input_file)
+        return {
+            "status_code": 200,
+            "user_id": user_id,
+            "job_id": job_id,
+            "input_files_csv_data": list_of_all_input_files_data,
+        }
+    else:
+        return {
+            "status_code": 200,
+            "user_id": user_id,
+            "job_id": job_id,
+            "input_files_csv_data": [],
+        }
+
+
+def download_output_csv_file_of_batch_ids(user_id, job_id, list_of_batch_ids):
+    client = get_openai_client(user_id, job_id)
+    if client:
+        list_of_all_input_files_data = []
+        for batch_id in list_of_batch_ids:
+            output_dataframe_json = steps.download_file.download_csv_of_batch_id(
+                client, batch_id
+            )
+            if output_dataframe_json.get("file_dataframe") is not None:
+                dataframe_bytes_and_data = convert_df_to_bytes(
+                    output_dataframe_json["file_dataframe"]
+                )
+                input_file = {
+                    "batch_id": batch_id,
+                    "status": output_dataframe_json["status"],
+                    "output_file_id": output_dataframe_json["output_file_id"],
+                    "total_test_rows_processed": dataframe_bytes_and_data[
+                        "total_test_rows_processed"
+                    ],
+                    "row_preview_data": dataframe_bytes_and_data["row_preview_data"],
+                    "file_data": dataframe_bytes_and_data["file_data"],
+                }
+                list_of_all_input_files_data.append(input_file)
+            else:
+                input_file = {
+                    "batch_id": batch_id,
+                    "status": output_dataframe_json["status"],
+                    "output_file_id": output_dataframe_json["output_file_id"],
+                    "total_test_rows_processed": None,
+                    "row_preview_data": None,
+                    "file_data": None,
+                }
+                list_of_all_input_files_data.append(input_file)
+        return {
+            "status_code": 200,
+            "user_id": user_id,
+            "job_id": job_id,
+            "output_files_csv_data": list_of_all_input_files_data,
+        }
+    else:
+        return {
+            "status_code": 200,
+            "user_id": user_id,
+            "job_id": job_id,
+            "output_files_csv_data": [],
         }

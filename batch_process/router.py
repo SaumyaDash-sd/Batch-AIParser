@@ -11,7 +11,10 @@ from .main import (
     batch_processing_create_and_upload_file,
     batch_processing_upload_file,
     start_batch_of_file_ids,
+    start_batch_of_job_id,
     check_status_of_batch_ids_of_job,
+    download_input_csv_file_of_file_ids,
+    download_output_csv_file_of_batch_ids,
 )
 from login_setup import authenticate_user_token
 
@@ -63,9 +66,6 @@ async def create_and_upload_file(
 class StartBatchModel(BaseModel):
     file_ids: list
 
-class CheckBatchStatusModel(BaseModel):
-    batch_ids: list[str]
-
 
 @batch_process_router.post("/process/create-start-batch/")
 async def create_and_start_batch(
@@ -82,10 +82,31 @@ async def create_and_start_batch(
         raise HTTPException(status_code=401, detail="Unauthorized User")
     else:  
         result = start_batch_of_file_ids(
-            user_id, job_id, list_of_file_ids
+            user_id, job_id, list_of_file_ids.file_ids
         )
         response.status_code = 200
-        result["message"] = "Data pre-processing and upload done"
+        result["message"] = f"Batch started sucessfully of job_id: {job_id}"
+        return result
+
+
+@batch_process_router.post("/process/start-batch-of-job/")
+async def start_all_batch_of_job_id(
+    user_id: str,
+    access_token: str,
+    job_id: str,
+    response: Response,
+):
+    # access_token = "e284aabe-2e54-4b11-b1f8-ff2b4c81d9d7"
+    # Validate user_id and access_token  and status active
+    if not authenticate_user_token(user_id, access_token):
+        response.status_code = 401
+        raise HTTPException(status_code=401, detail="Unauthorized User")
+    else:  
+        result = start_batch_of_job_id(
+            user_id, job_id
+        )
+        response.status_code = 200
+        result["message"] = f"Batch started sucessfully of job_id: {job_id}"
         return result
 
 
@@ -129,6 +150,10 @@ async def upload_file_for_batch(
         return result
 
 
+class CheckBatchStatusModel(BaseModel):
+    batch_ids: list[str]
+
+
 @batch_process_router.post("/process/check-batch-status/")
 async def check_batch_status(
     user_id: str,
@@ -148,6 +173,58 @@ async def check_batch_status(
         )
         response.status_code = 200
         result["message"] = "Batch status fetched successfully"
+        return result
+
+
+class DownloadInputFileModel(BaseModel):
+    file_ids: list[str]
+
+
+@batch_process_router.post("/download/input-file/")
+async def download_input_csv_file(
+    user_id: str,
+    access_token: str,
+    job_id: str,
+    response: Response,
+    list_of_file_ids: DownloadInputFileModel,  # Will contain JSON string
+):
+    # access_token = "e284aabe-2e54-4b11-b1f8-ff2b4c81d9d7"
+    # Validate user_id and access_token  and status active
+    if not authenticate_user_token(user_id, access_token):
+        response.status_code = 401
+        raise HTTPException(status_code=401, detail="Unauthorized User")
+    else:
+        result = download_input_csv_file_of_file_ids(
+            user_id, job_id, list_of_file_ids.file_ids
+        )
+        response.status_code = 200
+        result["message"] = "Input file data fetched successfully"
+        return result
+
+
+class DownloadOutputFileModel(BaseModel):
+    batch_ids: list[str]
+
+
+@batch_process_router.post("/download/output-file/")
+async def download_output_csv_file(
+    user_id: str,
+    access_token: str,
+    job_id: str,
+    response: Response,
+    list_of_batch_ids: DownloadOutputFileModel,  # Will contain JSON string
+):
+    # access_token = "e284aabe-2e54-4b11-b1f8-ff2b4c81d9d7"
+    # Validate user_id and access_token  and status active
+    if not authenticate_user_token(user_id, access_token):
+        response.status_code = 401
+        raise HTTPException(status_code=401, detail="Unauthorized User")
+    else:
+        result = download_output_csv_file_of_batch_ids(
+            user_id, job_id, list_of_batch_ids.batch_ids
+        )
+        response.status_code = 200
+        result["message"] = "Output file data fetched successfully"
         return result
 
 

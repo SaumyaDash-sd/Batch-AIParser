@@ -1,35 +1,42 @@
 import re
+import ast
 import json
 import pandas as pd
 from io import BytesIO
 
 
-def handling_gpt_output(gpt_response):
+def handling_gpt_output(gpt_response: str) -> dict:
     """
-    Extracts and formats GPT response into JSON safely.
-    - Finds content between the first '{' and last '}'.
-    - Parses it into a dict if valid JSON.
-    - If no braces exist, returns the raw output.
+    Attempts to parse the provided GPT response as a list or dictionary.
+    If that fails, extracts the content between the first and last curly braces
+    and parses it using ast.literal_eval.
+
+    Args:
+        gpt_response (str): The GPT response to be parsed.
+
+    Returns:
+        dict: The parsed GPT response as a dictionary, or an empty dictionary if parsing fails.
     """
-    if not gpt_response:
-        return {}
-
-    # Find JSON substring between first '{' and last '}'
-    match = re.search(r"\{.*\}", gpt_response, re.DOTALL)
-    if match:
-        json_str = match.group(0).strip()
-        try:
-            parsed = json.loads(json_str)
-            if isinstance(parsed, dict):
-                return parsed
-            return {"raw_output": parsed}
-        except Exception:
-            return {
-                "raw_output": json_str
-            }  # Return extracted string if JSON parsing fails
-
-    # No curly braces found → return raw response
-    return {"raw_output": gpt_response.strip()}
+    try:
+        # Attempt to parse the entire response
+        parsed = ast.literal_eval(gpt_response)
+        if isinstance(parsed, (dict, list)):
+            return parsed
+        else:
+            pass
+    except Exception as e:
+        pass
+    # Fallback: extract content between the first and last curly braces
+    try:
+        start_index = gpt_response.find("{")
+        end_index = gpt_response.rfind("}")
+        if start_index != -1 and end_index != -1:
+            extracted_content = gpt_response[start_index : end_index + 1]
+            parsed = ast.literal_eval(extracted_content)
+            return parsed
+    except Exception as inner_e:
+        pass
+    return {}
 
 
 def output_jsonl_to_dataframe(jsonl_bytes: bytes) -> pd.DataFrame:
@@ -63,6 +70,7 @@ def output_jsonl_to_dataframe(jsonl_bytes: bytes) -> pd.DataFrame:
             parsed_content = {}
             try:
                 parsed_content = handling_gpt_output(content) or {}
+                print(parsed_content)
             except Exception:
                 pass  # fallback to empty dict if malformed
 
