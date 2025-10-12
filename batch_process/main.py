@@ -8,6 +8,11 @@ from batch_history import (
 )
 from .utils import convert_df_to_bytes
 from . import steps
+from .steps.batch_status import check_batch_progress
+from batch_history import (
+    get_batch_status_and_output_file_id,
+    update_batch_status_if_changed,
+)
 
 
 def batch_processing_create_and_upload_file(user_id, filename, df, description_json):
@@ -92,3 +97,36 @@ def start_batch_of_file_ids(user_id, job_id, list_of_file_ids):
         "batch_count": len(batch_files_list),
         "message": f"{len(batch_files_list)} has been started, check progress in batch status tab",
     }
+
+
+def check_status_of_batch_ids_of_job(user_id, job_id, list_of_batch_ids):
+    client = get_openai_client(user_id, job_id)
+    if client:
+        list_of_all_batch_status = []
+        for batch_id in list_of_batch_ids:
+            batch_status = get_batch_status_and_output_file_id(user_id, job_id, batch_id)
+            if batch_status["status"] != "completed":
+                current_batch_status = check_batch_progress(client, batch_id)
+                batch_status["status"] = current_batch_status["status"]
+                batch_status["output_file_id"] = current_batch_status["output_file_id"]
+                update_batch_status_if_changed(
+                    user_id,
+                    job_id,
+                    batch_id,
+                    latest_status=current_batch_status["status"],
+                    output_file_id=current_batch_status.get("output_file_id"),
+                )
+            list_of_all_batch_status.append(batch_status)
+        return {
+            "status_code": 200,
+            "user_id": user_id,
+            "job_id": job_id,
+            "batch_status": list_of_all_batch_status,
+        }
+    else:
+        return {
+            "status_code": 200,
+            "user_id": user_id,
+            "job_id": job_id,
+            "batch_status": [],
+        }

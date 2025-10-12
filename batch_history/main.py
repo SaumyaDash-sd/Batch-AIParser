@@ -345,3 +345,74 @@ def get_chunk_no_and_row_count(user_id, job_id, file_id):
         return first_row["chunk_no"], first_row["total_rows_processed"]
     else:
         return None, None
+
+
+def get_batch_status_and_output_file_id(user_id, job_id, batch_id):
+    # Step 1: Read the DataFrame
+    df = read_batch_files()
+
+    # Step 2: Filter for the matching row
+    filtered = df[
+        (df["user_id"] == user_id) &
+        (df["job_id"] == job_id) &
+        (df["batch_id"] == batch_id) &
+        (df["deleted_at"].isna())
+    ]
+
+    # Step 3: Check if any row matches
+    if not filtered.empty:
+        first_row = filtered.iloc[0]
+        result = {
+            "status": first_row["status"],
+            "batch_id": batch_id,
+            "output_file_id": first_row["output_file_id"]
+        }
+    else:
+        # If no match found, return None or some default value
+        result = {
+            "status": None,
+            "batch_id": batch_id,
+            "output_file_id": None
+        }
+
+    # Step 4: Convert to JSON and return
+    return result
+
+
+def update_batch_status_if_changed(user_id, job_id, batch_id, latest_status, output_file_id=None):
+    """
+    Update the batch status and output_file_id in the CSV if the latest_status
+    is different from the current status.
+    
+    Parameters:
+        user_id (int/str)
+        job_id (int/str)
+        batch_id (int/str)
+        latest_status (str)
+        output_file_id (optional, int/str): only updated if status is 'completed'
+    """
+    # Step 1: Read the CSV
+    df = read_batch_files()
+    
+    # Step 2: Create mask for the specific row
+    mask = (
+        (df["user_id"] == user_id) &
+        (df["job_id"] == job_id) &
+        (df["batch_id"] == batch_id) &
+        (df["deleted_at"].isna())
+    )
+    
+    # Step 3: Check if row exists
+    if not df[mask].empty:
+        current_status = df.loc[mask, "status"].iloc[0]
+        
+        # Step 4: Update only if status is different
+        if current_status != latest_status:
+            df.loc[mask, "status"] = latest_status
+            
+            # Update output_file_id if the status is completed and value is provided
+            if latest_status == "completed" and output_file_id is not None:
+                df.loc[mask, "output_file_id"] = output_file_id
+            
+            # Step 5: Write back to CSV
+            write_batch_files(df)

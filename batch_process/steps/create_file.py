@@ -28,7 +28,7 @@ def clean_dataframe(dataframe, unique_id_column_name):
 
     df = dataframe.copy()  # avoid modifying original
 
-     # ---- NEW: Handle null unique_id_column ----
+    # ---- NEW: Handle null unique_id_column ----
     if not unique_id_column_name:
         unique_id_column_name = "unique_id"
         logging.info(
@@ -116,7 +116,6 @@ def replace_placeholders_with_col_values(
     return df
 
 
-
 def start_process(dataframe, unique_id_column_name):
     df1 = clean_dataframe(dataframe, unique_id_column_name)
     df2 = add_prompt_column(df1, prompt)
@@ -139,10 +138,7 @@ if __name__ == "__main__":
     "category": "your suggested category for input url"
     }
     """
-    placeholder_field = {
-        "input_url": "URL"
-    }
-
+    placeholder_field = {"input_url": "URL"}
 
     df1 = clean_dataframe(dataframe, unique_id_column_name)
     df2 = add_prompt_column(df1, prompt)

@@ -10,6 +10,8 @@ from .main import (
     soft_delete_batch_file,
     get_openai_client,
     get_chunk_no_and_row_count,
+    get_batch_status_and_output_file_id,
+    update_batch_status_if_changed,
 )
 from .router import batch_job_history_router
 
@@ -27,4 +29,6 @@ __all__ = [
     "batch_job_history_router",
     "get_openai_client",
     "get_chunk_no_and_row_count",
+    "get_batch_status_and_output_file_id",
+    "update_batch_status_if_changed",
 ]

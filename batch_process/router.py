@@ -11,6 +11,7 @@ from .main import (
     batch_processing_create_and_upload_file,
     batch_processing_upload_file,
     start_batch_of_file_ids,
+    check_status_of_batch_ids_of_job,
 )
 from login_setup import authenticate_user_token
 
@@ -61,6 +62,9 @@ async def create_and_upload_file(
 
 class StartBatchModel(BaseModel):
     file_ids: list
+
+class CheckBatchStatusModel(BaseModel):
+    batch_ids: list[str]
 
 
 @batch_process_router.post("/process/create-start-batch/")
@@ -122,6 +126,28 @@ async def upload_file_for_batch(
             user_id, file.filename, df, description_json
         )
         response.status_code = 200
+        return result
+
+
+@batch_process_router.post("/process/check-batch-status/")
+async def check_batch_status(
+    user_id: str,
+    access_token: str,
+    job_id: str,
+    response: Response,
+    list_of_batch_ids: CheckBatchStatusModel,  # Will contain JSON string
+):
+    # access_token = "e284aabe-2e54-4b11-b1f8-ff2b4c81d9d7"
+    # Validate user_id and access_token  and status active
+    if not authenticate_user_token(user_id, access_token):
+        response.status_code = 401
+        raise HTTPException(status_code=401, detail="Unauthorized User")
+    else:
+        result = check_status_of_batch_ids_of_job(
+            user_id, job_id, list_of_batch_ids.batch_ids
+        )
+        response.status_code = 200
+        result["message"] = "Batch status fetched successfully"
         return result
 
 

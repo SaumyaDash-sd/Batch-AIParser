@@ -11,19 +11,20 @@ from datetime import datetime
 
 
 from batch_history import get_openai_client, get_chunk_no_and_row_count
+from .batch_status import check_batch_progress
 
 
-def check_batch_status(client, batch_id):
-    # Monitor the batch status
-    status = "validating"
-    batch_response = client.batches.retrieve(batch_id)  # Fetch updated batch info
-    status = batch_response.status
+# def check_batch_status(client, batch_id):
+#     # Monitor the batch status
+#     status = "validating"
+#     batch_response = client.batches.retrieve(batch_id)  # Fetch updated batch info
+#     status = batch_response.status
 
-    if batch_response.status == "completed":
-        output_file_id = batch_response.output_file_id
-        return batch_id, output_file_id, status
-    else:
-        return batch_id, None, status
+#     if batch_response.status == "completed":
+#         output_file_id = batch_response.output_file_id
+#         return batch_id, output_file_id, status
+#     else:
+#         return batch_id, None, status
 
 
 def start_batch(client, file_id, endpoint="/chat/completions", completion_window="24h"):
@@ -68,9 +69,9 @@ def start_process(user_id, job_id, list_of_file_ids):
         )
     final_batch_job_data = []
     for index, batch in enumerate(batch_jobs_data, start=1):
-        batch_id, output_file_id, status = check_batch_status(client, batch["batch_id"])
-        batch["status"] = status
-        batch["output_file_id"] = output_file_id
+        batch_response = check_batch_progress(client, batch["batch_id"])
+        batch["status"] = batch_response["status"]
+        batch["output_file_id"] = batch_response["output_file_id"]
         final_batch_job_data.append(batch)
 
     return final_batch_job_data
@@ -94,6 +95,6 @@ if __name__ == "__main__":
     batch_id = start_batch(client, file_id)
 
     # batch_id = "batch_654dfadb-dd45-428d-adf7-1dba29731427"
-    output = check_batch_status(client, batch_id)
+    output = check_batch_progress(client, batch_id)
 
     print(output)
