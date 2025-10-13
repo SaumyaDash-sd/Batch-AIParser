@@ -39,7 +39,7 @@ def batch_processing_create_and_upload_file(user_id, filename, df, description_j
     for file_data in uploaded_files_list:
         file_id = file_data.get("file_id", None)
         job_data["file_status"] = file_data.get("status")
-        job_data["batch_status"] = file_data.get("not_started")
+        job_data["batch_status"] = "not_started"
         job_data["chunk_no"] = file_data.get("chunk_no")
         job_data["total_rows_processed"] = file_data.get("total_rows_processed")
 

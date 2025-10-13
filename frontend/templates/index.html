@@ -906,8 +906,8 @@
     <div class="app-container">
         <div id="loginScreen" class="login-screen">
             <div class="login-container">
-                <div class="logo-container">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
+                <div class="logo-container"><img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
                         alt="Logo" class="logo">
                     <h1 class="login-title">BatchProcessor Pro</h1>
                     <p class="login-subtitle">Advanced Batch Processing Platform</p>
@@ -916,9 +916,8 @@
                     <div class="form-group"><input type="email" id="email" class="form-input"
                             placeholder="Email Address" required></div>
                     <div class="form-group"><input type="password" id="password" class="form-input"
-                            placeholder="Password" required></div>
-                    <button type="submit" class="login-btn">
-                        <span id="loginText">Sign In</span>
+                            placeholder="Password" required></div><button type="submit" class="login-btn"><span
+                            id="loginText">Sign In</span>
                         <div id="loginSpinner" class="spinner hidden"
                             style="width: 20px; height: 20px; border-width: 2px; margin: 0 auto;"></div>
                     </button>
@@ -928,24 +927,20 @@
 
         <div id="dashboard" class="dashboard">
             <nav class="navbar">
-                <div class="nav-logo">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
-                        alt="Logo" class="nav-logo-icon">
-                    BatchProcessor Pro
-                </div>
-                <div class="nav-menu">
-                    <a href="#" class="nav-item active" data-section="create-job">Create Job</a>
-                    <a href="#" class="nav-item" data-section="uploaded-files-history">Uploaded Files History</a>
-                    <a href="#" class="nav-item" data-section="batch-jobs-history">Batch Jobs History</a>
-                </div>
-                <div class="profile-menu">
-                    <button class="profile-btn" id="profileBtn"><span id="profileInitial">U</span></button>
+                <div class="nav-logo"><img
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
+                        alt="Logo" class="nav-logo-icon"> BatchProcessor Pro</div>
+                <div class="nav-menu"><a href="#" class="nav-item active" data-section="create-job">Create Job</a><a
+                        href="#" class="nav-item" data-section="uploaded-files-history">Uploaded Files History</a><a
+                        href="#" class="nav-item" data-section="batch-jobs-history">Batch Jobs History</a></div>
+                <div class="profile-menu"><button class="profile-btn" id="profileBtn"><span
+                            id="profileInitial">U</span></button>
                     <div class="profile-dropdown" id="profileDropdown">
                         <div class="profile-info"><strong>User Name:</strong> <span id="userName">User Name</span></div>
                         <div class="profile-info"><strong>Email:</strong> <span id="userEmail">user@email.com</span>
                         </div>
-                        <div class="profile-info"><strong>Role:</strong> <span id="userRole">User</span></div>
-                        <button class="logout-btn" id="logoutBtn">Logout</button>
+                        <div class="profile-info"><strong>Role:</strong> <span id="userRole">User</span></div><button
+                            class="logout-btn" id="logoutBtn">Logout</button>
                     </div>
                 </div>
             </nav>
@@ -1104,16 +1099,15 @@
     </div>
 
     <div id="filesModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 1000px;">
-            <button class="modal-close-btn" data-modal-id="filesModal">&times;</button>
+        <div class="modal-content" style="max-width: 1000px;"><button class="modal-close-btn"
+                data-modal-id="filesModal">&times;</button>
             <h2 id="filesModalTitle" class="modal-title"></h2>
             <div id="filesModalBody" class="modal-body"></div>
         </div>
     </div>
-
     <div id="downloadPreviewModal" class="modal-overlay" style="z-index: 1001;">
-        <div class="modal-content" style="max-width: 700px;">
-            <button class="modal-close-btn" data-modal-id="downloadPreviewModal">&times;</button>
+        <div class="modal-content" style="max-width: 700px;"><button class="modal-close-btn"
+                data-modal-id="downloadPreviewModal">&times;</button>
             <h2 class="modal-title">Download Preview</h2>
             <div id="downloadPreviewModalBody" class="modal-body"></div>
         </div>
@@ -1131,20 +1125,20 @@
             const START_BATCH_ENDPOINT = `${API_BASE_URL}/batch-job/process/start-batch-of-job/`;
             const FETCH_PARENT_JOBS_ENDPOINT = `${API_BASE_URL}/batch-history/history/batch-job/`;
             const FETCH_UPLOADED_FILES_ENDPOINT = `${API_BASE_URL}/batch-history/history/uploaded-file/`;
-            const FETCH_BATCH_FILES_ENDPOINT = `${API_BASE_URL}/batch-history/history/batch-file/`; // ASSUMED ENDPOINT
+            const FETCH_BATCH_FILES_ENDPOINT = `${API_BASE_URL}/batch-history/history/batch-file/`;
             const DELETE_UPLOADED_FILE_ENDPOINT = `${API_BASE_URL}/batch-history/delete/uploaded-file/`;
             const DELETE_BATCH_FILE_ENDPOINT = `${API_BASE_URL}/batch-history/delete/batch-file/`;
             const START_SINGLE_BATCH_ENDPOINT = `${API_BASE_URL}/batch-job/process/create-start-batch/`;
             const DOWNLOAD_INPUT_FILE_ENDPOINT = `${API_BASE_URL}/batch-job/download/input-file/`;
             const DOWNLOAD_OUTPUT_FILE_ENDPOINT = `${API_BASE_URL}/batch-job/download/output-file/`;
 
-            // --- STATE MANAGEMENT ---
+            // --- STATE ---
             let currentUser = null;
             let jobCreationResultState = null;
             const createJobState = { jobTitle: null, file: null, columns: [], totalRows: 0, previewData: [], prompt: null, placeholders: [], mappings: {}, uniqueIdField: null, outputJson: null, isProcessing: false, config: { chunkSize: 20 }, credentials: { endpoint: null, apiKey: null, deploymentName: null, temperature: 0.3 } };
-            const historyState = { parentJobs: [], isLoading: false, hasFetched: false, uploadedFiles: [], batchFiles: [] };
+            const historyState = { parentJobs: [], isLoading: false, hasFetched: false };
 
-            // --- UTILITY FUNCTIONS ---
+            // --- UTILS ---
             const formatFileSize = (bytes) => { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`; };
             const showToast = (message, type = 'info') => { const c = document.getElementById('toastContainer'), t = document.createElement('div'); t.className = `toast toast-${type}`; t.textContent = message; c.appendChild(t); setTimeout(() => t.classList.add('show'), 100); setTimeout(() => { t.classList.remove('show'); t.addEventListener('transitionend', () => t.remove()); }, 4000); };
             const downloadBase64File = (base64Data, fileName) => { try { const s = `data:application/octet-stream;base64,${base64Data}`, a = document.createElement("a"); a.href = s; a.download = fileName; a.click(); } catch (e) { showToast('Failed to initiate download.', 'error'); console.error('Download error:', e); } };
@@ -1170,29 +1164,88 @@
             };
             const handleRouting = () => { const section = window.location.hash.slice(2) || 'create-job'; if (currentUser) switchSection(section); else { document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('dashboard').style.display = 'none'; } };
 
-            // --- AUTHENTICATION ---
+            // --- AUTH ---
             const login = async (e, t) => { document.getElementById("loginText").style.display = "none", document.getElementById("loginSpinner").classList.remove("hidden"), document.querySelector(".login-btn").disabled = !0; try { const s = await fetch(`${LOGIN_ENDPOINT}/${encodeURIComponent(e)}/${encodeURIComponent(t)}`), a = await s.json(); if (!s.ok || 200 !== a.status_code) throw new Error(a.message || "Login failed"); currentUser = a, localStorage.setItem("currentUser", JSON.stringify(currentUser)), showDashboard(), switchSection("create-job") } catch (s) { showToast(s.message, "error") } finally { document.getElementById("loginText").style.display = "inline", document.getElementById("loginSpinner").classList.add("hidden"), document.querySelector(".login-btn").disabled = !1 } }; const logout = e => { localStorage.removeItem("currentUser"), currentUser = null, window.location.hash = "", document.getElementById("loginScreen").style.display = "flex", document.getElementById("dashboard").style.display = "none", e && setTimeout(() => showToast(e, "info"), 100) }; const showDashboard = () => { document.getElementById("loginScreen").style.display = "none", document.getElementById("dashboard").style.display = "block", document.getElementById("userName").textContent = `${currentUser.first_name} ${currentUser.last_name}`, document.getElementById("profileInitial").textContent = (currentUser.first_name[0] + (currentUser.last_name[0] || "")).toUpperCase(), document.getElementById("userEmail").textContent = currentUser.email, document.getElementById("userRole").textContent = currentUser.role }; const checkSession = async () => { const e = localStorage.getItem("currentUser"); if (!e) return void handleRouting(); const t = JSON.parse(e); if (!t.user_id || !t.access_token) return void logout(); try { const s = new URL(VALIDATE_TOKEN_ENDPOINT); s.searchParams.append("user_id", t.user_id), s.searchParams.append("access_token", t.access_token); const a = await fetch(s.toString()); if (!a.ok) return void logout("Session expired. Please log in again."); currentUser = await a.json(), localStorage.setItem("currentUser", JSON.stringify(currentUser)), showDashboard(), handleRouting() } catch (s) { console.error("Session validation failed:", s), logout("Session could not be verified. Please log in again.") } };
 
-            // --- CREATE JOB LOGIC (minified for brevity, it is unchanged) ---
-            const createJobManager = { currentStep: 1, goToStep(e) { this.currentStep = e, document.querySelectorAll("#create-job .step").forEach((t, s) => { t.classList.remove("active", "completed"), s + 1 < e && t.classList.add("completed"), s + 1 === e && t.classList.add("active") }), document.querySelectorAll("#create-job .form-step").forEach(t => { t.classList.remove("active"), parseInt(t.dataset.step) === e && t.classList.add("active") }), 1 === e && this.setupStep1(), 2 === e && this.setupStep2(), 3 === e && this.setupStep3(), 4 === e && this.setupStep4(), 5 === e && this.setupStep5(), 6 === e && this.setupStep6() }, setupStep1() { this.validateStep1() }, validateStep1() { const e = document.getElementById("cj_next_1"), t = document.getElementById("jobTitle").value.trim().length > 0, s = !!createJobState.file; return t ? hideError("jobTitleError") : showError("jobTitleError", "Job Title is required."), s ? hideError("fileError") : showError("fileError", "A file is required."), e.disabled = !(t && s), t && s }, async setupStep2() { const e = document.getElementById("dataPreviewContainer"), t = document.getElementById("cj_next_2"); if (t.disabled = !0, createJobState.previewData.length > 0) return this.renderPreviewTable(e), void (t.disabled = !1); const s = document.getElementById("previewLoading"); s.style.display = "block", e.innerHTML = "", e.appendChild(s); try { const s = await this.parseFile(createJobState.file); createJobState.columns = s.headers, createJobState.previewData = s.rows, createJobState.totalRows = s.totalRows, this.renderPreviewTable(e), t.disabled = !1 } catch (s) { e.innerHTML = `<p style="color: #ffcdd2;">Error parsing file: ${s.message}</p>` } }, renderPreviewTable(e) { const t = document.createElement("table"); t.className = "data-table", t.innerHTML = `<thead><tr>${createJobState.columns.map(e => `<th>${e}</th>`).join("")}</tr></thead><tbody>${createJobState.previewData.map(e => `<tr>${e.map(e => `<td>${e}</td>`).join("")}</tr>`).join("")}</tbody>`, e.innerHTML = "", e.appendChild(t) }, parseFile: e => new Promise((t, s) => { const a = new FileReader; a.onload = t => { try { const s = e.name.toLowerCase().endsWith(".csv") ? XLSX.read(t.target.result, { type: "string" }) : XLSX.read(new Uint8Array(t.target.result), { type: "array" }), r = s.SheetNames[0], i = s.Sheets[r], l = XLSX.utils.sheet_to_json(i, { header: 1, defval: "" }); if (0 === l.length) return reject(new Error("File is empty.")); let n = l[0].map(e => "string" == typeof e ? e.replace(/^\uFEFF/, "").trim() : e); t({ headers: n, rows: l.slice(1, 21), totalRows: l.length - 1 }) } catch (t) { s(t) } }, a.onerror = s, e.name.toLowerCase().endsWith(".csv") ? a.readAsText(e) : a.readAsArrayBuffer(e) }), setupStep3() { this.validateStep3() }, validateStep3() { const e = document.getElementById("cj_next_3"), t = document.getElementById("prompt").value.trim().length > 0; return t ? hideError("promptError") : showError("promptError", "Prompt cannot be empty."), e.disabled = !t, t }, setupStep4() { const e = document.getElementById("mappingContainer"), t = document.getElementById("uniqueId"), s = "<option value=\"\">-- Select Column --</option>" + createJobState.columns.map(e => `<option value="${e}">${e}</option>`).join(""); t.innerHTML = "<option value=\"\">None</option>" + s, createJobState.placeholders.length > 0 ? (e.innerHTML = `<table class="data-table"><thead><tr><th>Placeholder</th><th>Column Name</th></tr></thead><tbody>${createJobState.placeholders.map(e => `<tr><td>{{${e}}}</td><td><select class="form-select mapping-select" data-placeholder="${e}">${s}</select></td></tr>`).join("")}</tbody></table>`, document.querySelectorAll(".mapping-select").forEach(e => e.addEventListener("input", () => this.validateStep4()))) : e.innerHTML = '<p style="color: white;">No placeholders found in the prompt.</p>', this.validateStep4() }, validateStep4() { const e = document.getElementById("cj_next_4"); let t = Array.from(document.querySelectorAll(".mapping-select")).every(e => e.value); t ? hideError("mappingError") : showError("mappingError", "Please map all placeholders."); let s = !0; const a = document.getElementById("outputJson").value.trim(); return a ? s = s : hideError("jsonError"), e.disabled = !(t && s), t && s }, setupStep5() { this.validateStep5() }, validateStep5() { const e = document.getElementById("cj_next_5"), t = [{ id: "endpoint", type: "url", errorId: "endpointError", msg: "Please enter a valid URL." }, { id: "apiKey", type: "text", errorId: "apiKeyError", msg: "API Key is required." }, { id: "deploymentName", type: "text", errorId: "deploymentNameError", msg: "Deployment Name is required." }, { id: "temperature", type: "range", errorId: "temperatureError", msg: "Temperature must be between 0 and 2." }], s = t.every(e => { const t = document.getElementById(e.id); let s = !1; if ("url" === e.type) try { new URL(t.value), s = !0 } catch (e) { s = !1 } else "range" === e.type ? (s = parseFloat(t.value), s = !isNaN(s) && s >= 0 && s <= 2) : s = t.value.trim().length > 0; return s ? hideError(e.errorId) : showError(e.errorId, e.msg), s }); return e.disabled = !s, s }, setupStep6() { document.getElementById("summaryContainer").innerHTML = `<p><strong>Job Title:</strong> ${createJobState.jobTitle}</p><p><strong>File Name:</strong> ${createJobState.file.name}</p><p><strong>Total Rows:</strong> ${createJobState.totalRows.toLocaleString()}</p><p><strong>Chunk Size:</strong> ${createJobState.config.chunkSize}</p>`, document.getElementById("processingResult").classList.add("hidden"), document.getElementById("overviewButtons").classList.remove("hidden") }, async submitJob() { if (createJobState.isProcessing) return; createJobState.isProcessing = !0; const e = document.getElementById("overviewButtons"), t = document.getElementById("processingResult"); e.classList.add("hidden"), t.classList.remove("hidden"), t.innerHTML = '<div class="loading"><div class="spinner"></div><p>Uploading file and creating job...</p></div>'; const s = { job_title: createJobState.jobTitle, prompt: createJobState.prompt, placeholder_field: createJobState.mappings, unique_id_field: createJobState.uniqueIdField, output_field: createJobState.outputJson, config: createJobState.config, credentials: createJobState.credentials }, a = new FormData; a.append("file", createJobState.file), a.append("description", JSON.stringify(s)); const r = new URL(CREATE_UPLOAD_ENDPOINT); r.searchParams.append("user_id", currentUser.user_id), r.searchParams.append("access_token", currentUser.access_token); try { const e = await fetch(r.toString(), { method: "POST", body: a }), s = await e.json(); if (!e.ok) throw new Error(s.detail || `API Error (${e.status})`); showToast(s.message || "Job created successfully", "success"), displayJobCreationResult(s) } catch (s) { console.error("API Call Failed:", s), t.innerHTML = `<p style="color: #ffcdd2;">Error: ${s.message}</p>`, e.classList.remove("hidden") } finally { createJobState.isProcessing = !1 } }, init() { document.getElementById("cj_next_1").addEventListener("click", () => { this.validateStep1() && (createJobState.jobTitle = document.getElementById("jobTitle").value, Object.assign(createJobState, { columns: [], previewData: [], totalRows: 0, prompt: null, placeholders: [], mappings: {}, uniqueIdField: null, outputJson: null }), this.goToStep(2)) }), document.getElementById("cj_prev_2").addEventListener("click", () => this.goToStep(1)), document.getElementById("cj_next_2").addEventListener("click", () => this.goToStep(3)), document.getElementById("cj_prev_3").addEventListener("click", () => this.goToStep(2)), document.getElementById("cj_next_3").addEventListener("click", () => { this.validateStep3() && (createJobState.prompt = document.getElementById("prompt").value, createJobState.placeholders = [...new Set(Array.from(createJobState.prompt.matchAll(/{{\s*(\w+)\s*}}/g), e => e[1]))], this.goToStep(4)) }), document.getElementById("cj_prev_4").addEventListener("click", () => this.goToStep(3)), document.getElementById("cj_next_4").addEventListener("click", () => { if (this.validateStep4()) { createJobState.mappings = {}, document.querySelectorAll(".mapping-select").forEach(e => { createJobState.mappings[e.dataset.placeholder] = e.value }), createJobState.uniqueIdField = document.getElementById("uniqueId").value || null; const e = document.getElementById("outputJson").value.trim(); createJobState.outputJson = e ? JSON.parse(e) : null, createJobState.config.chunkSize = parseInt(document.getElementById("chunkSizeInput").value), this.goToStep(5) } }), document.getElementById("cj_prev_5").addEventListener("click", () => this.goToStep(4)), document.getElementById("cj_next_5").addEventListener("click", () => { this.validateStep5() && (createJobState.credentials.endpoint = document.getElementById("endpoint").value, createJobState.credentials.apiKey = document.getElementById("apiKey").value, createJobState.credentials.deploymentName = document.getElementById("deploymentName").value, createJobState.credentials.temperature = parseFloat(document.getElementById("temperature").value), this.goToStep(6)) }), document.getElementById("cj_prev_6").addEventListener("click", () => { this.isProcessing = !1, this.goToStep(5) }), document.getElementById("submitJobBtn").addEventListener("click", () => this.submitJob()); const e = document.getElementById("fileInput"), t = document.getElementById("fileUploadArea"), s = e => { e.length > 0 && (createJobState.file = e[0], document.getElementById("fileInfo").innerHTML = `<strong>File:</strong> ${createJobState.file.name} | <strong>Size:</strong> ${formatFileSize(createJobState.file.size)}`, document.getElementById("fileInfo").classList.remove("hidden"), this.validateStep1()) }; t.addEventListener("click", () => e.click()), t.addEventListener("dragover", e => { e.preventDefault(), t.classList.add("drag-over") }), t.addEventListener("dragleave", () => t.classList.remove("drag-over")), t.addEventListener("drop", e => { e.preventDefault(), t.classList.remove("drag-over"), s(e.dataTransfer.files) }), e.addEventListener("change", e => s(e.target.files)), document.getElementById("jobTitle").addEventListener("input", () => this.validateStep1()), document.getElementById("prompt").addEventListener("input", () => this.validateStep3()), document.getElementById("outputJson").addEventListener("input", () => this.validateStep4()), document.getElementById("chunkSize").addEventListener("input", e => { document.getElementById("chunkSizeInput").value = e.target.value, this.validateStep4() }), document.getElementById("chunkSizeInput").addEventListener("input", e => { document.getElementById("chunkSize").value = e.target.value, this.validateStep4() }), ["endpoint", "apiKey", "deploymentName", "temperature"].forEach(e => document.getElementById(id).addEventListener("input", () => this.validateStep5())), this.setupStep1() } };
-            const displayJobCreationResult = e => { jobCreationResultState = e; const t = document.getElementById("jobCreationResult"), s = document.getElementById("createJobFormContainer"), a = `<div class="result-summary-grid"><div class="summary-card"><div class="summary-card-title">Job Title</div><div class="summary-card-value">${e.job_title}</div></div><div class="summary-card"><div class="summary-card-title">Rows Processed</div><div class="summary-card-value">${e.total_test_rows_processed}</div></div><div class="summary-card"><div class="summary-card-title">Chunks Created</div><div class="summary-card-value">${e.chunks}</div></div></div>`; let r = "<h3>Data Preview</h3>"; e.row_preview_data && e.row_preview_data.length > 0 ? r += `<div class="data-table-container"><table class="data-table"><thead><tr>${Object.keys(e.row_preview_data[0]).map(e => `<th>${e.replace(/_/g, " ")}</th>`).join("")}</tr></thead><tbody>${e.row_preview_data.map(e => `<tr>${Object.keys(e).map(t => `<td>${JSON.stringify(e[t])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : r += "<p>No preview data available.</p>", t.innerHTML = `<h2 class="section-title">File Uploaded Successfully</h2>${a}${r}<div style="text-align:center; margin: 2rem 0;"><button class="btn btn-secondary" id="downloadInputCsvBtn">Download Input CSV File</button></div><p style="text-align:center; margin: 1rem 0;">If the preview is correct, press the button below to start the batch processing. You can also start it later from the 'Uploaded Files History' section.</p><div class="form-navigation" style="text-align: center;"><button class="btn btn-primary" id="startBatchBtn" style="font-size: 1.2rem; padding: 1rem 2rem;">Start Batch of ${e.chunks} Chunks</button></div>`, s.classList.add("hidden"), t.classList.remove("hidden"), document.getElementById("downloadInputCsvBtn").addEventListener("click", () => { downloadBase64File(jobCreationResultState.file_data, `${jobCreationResultState.job_title}_input.csv`) }), document.getElementById("startBatchBtn").addEventListener("click", startBatch) }; const startBatch = async () => { const e = document.getElementById("startBatchBtn"); if (!jobCreationResultState || !jobCreationResultState.job_id) return void showToast("Job ID is missing. Cannot start batch.", "error"); e.disabled = !0, e.textContent = "Starting..."; const t = new URL(START_BATCH_ENDPOINT); t.searchParams.append("user_id", currentUser.user_id), t.searchParams.append("access_token", currentUser.access_token), t.searchParams.append("job_id", jobCreationResultState.job_id); try { const s = await fetch(t.toString(), { method: "POST" }), a = await s.json(); if (!s.ok) throw new Error(a.message || "Failed to start batch."); showToast(a.message || "Batch started successfully!", "success"), e.textContent = "Batch Started!", e.style.background = "#2e7d32" } catch (s) { showToast(s.message, "error"), e.disabled = !1, e.textContent = `Start Batch of ${jobCreationResultState.chunks} Chunks` } };
+            // --- CREATE JOB ---
+            const createJobManager = {
+                currentStep: 1,
+                goToStep(step) { /* ... (unchanged) ... */ this.currentStep = step, document.querySelectorAll("#create-job .step").forEach((t, s) => { t.classList.remove("active", "completed"), s + 1 < step && t.classList.add("completed"), s + 1 === step && t.classList.add("active") }), document.querySelectorAll("#create-job .form-step").forEach(t => { t.classList.remove("active"), parseInt(t.dataset.step) === step && t.classList.add("active") }), 1 === step && this.setupStep1(), 2 === step && this.setupStep2(), 3 === step && this.setupStep3(), 4 === step && this.setupStep4(), 5 === step && this.setupStep5(), 6 === step && this.setupStep6() },
+                setupStep1() { this.validateStep1(); },
+                validateStep1() { const nextBtn = document.getElementById('cj_next_1'); const isTitleValid = document.getElementById('jobTitle').value.trim().length > 0; const isFileValid = !!createJobState.file; isTitleValid ? hideError('jobTitleError') : showError('jobTitleError', 'Job Title is required.'); isFileValid ? hideError('fileError') : showError('fileError', 'A file is required.'); const isValid = isTitleValid && isFileValid; nextBtn.disabled = !isValid; return isValid; },
+                async setupStep2() {
+                    const previewContainer = document.getElementById('dataPreviewContainer');
+                    const nextBtn = document.getElementById('cj_next_2');
+                    nextBtn.disabled = true;
+                    if (createJobState.previewData.length > 0) { this.renderPreviewTable(previewContainer); nextBtn.disabled = false; return; }
+                    const loading = document.getElementById('previewLoading');
+                    loading.style.display = 'block'; previewContainer.innerHTML = ''; previewContainer.appendChild(loading);
+                    try {
+                        const data = await this.parseFile(createJobState.file);
+                        createJobState.columns = data.headers;
+                        createJobState.previewData = data.rows;
+                        createJobState.totalRows = data.totalRows;
+                        this.renderPreviewTable(previewContainer);
+                        nextBtn.disabled = false;
+                    } catch (error) { previewContainer.innerHTML = `<p style="color: #ffcdd2;">Error parsing file: ${error.message}</p>`; }
+                },
+                renderPreviewTable(container) { const table = document.createElement('table'); table.className = 'data-table'; table.innerHTML = `<thead><tr>${createJobState.columns.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${createJobState.previewData.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`; container.innerHTML = ''; container.appendChild(table); },
+
+                // --- CORRECTED FILE PARSING LOGIC ---
+                parseFile(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            try {
+                                const data = event.target.result;
+                                const workbook = XLSX.read(data, { type: file.name.toLowerCase().endsWith('.csv') ? 'binary' : 'array' });
+                                const sheetName = workbook.SheetNames[0];
+                                if (!sheetName) return reject(new Error('No sheets found in the file.'));
+                                const worksheet = workbook.Sheets[sheetName];
+                                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                                if (json.length === 0) return reject(new Error('The file appears to be empty.'));
+                                let headers = json[0];
+                                if (!Array.isArray(headers)) return reject(new Error('Could not parse a valid header row.'));
+                                headers = headers.map(h => (h ? String(h).replace(/^\uFEFF/, '').trim() : ''));
+                                const dataRows = json.slice(1);
+                                resolve({ headers: headers, rows: dataRows.slice(0, 20), totalRows: dataRows.length });
+                            } catch (err) {
+                                console.error("File Parsing Error:", err);
+                                reject(new Error('There was an error parsing the file. Please check the file format.'));
+                            }
+                        };
+                        reader.onerror = (error) => { console.error("FileReader Error:", error); reject(new Error('Could not read the file.')); };
+                        if (file.name.toLowerCase().endsWith('.csv')) { reader.readAsBinaryString(file); }
+                        else { reader.readAsArrayBuffer(file); }
+                    });
+                },
+                // --- End of corrected function ---
+
+                setupStep3() { this.validateStep3(); },
+                validateStep3() { const nextBtn = document.getElementById('cj_next_3'); const isValid = document.getElementById('prompt').value.trim().length > 0; isValid ? hideError('promptError') : showError('promptError', 'Prompt cannot be empty.'); nextBtn.disabled = !isValid; return isValid; },
+                setupStep4() { /* ... (unchanged) ... */ const e = document.getElementById("mappingContainer"), t = document.getElementById("uniqueId"), s = "<option value=\"\">-- Select Column --</option>" + createJobState.columns.map(e => `<option value="${e}">${e}</option>`).join(""); t.innerHTML = "<option value=\"\">None</option>" + s, createJobState.placeholders.length > 0 ? (e.innerHTML = `<table class="data-table"><thead><tr><th>Placeholder</th><th>Column Name</th></tr></thead><tbody>${createJobState.placeholders.map(e => `<tr><td>{{${e}}}</td><td><select class="form-select mapping-select" data-placeholder="${e}">${s}</select></td></tr>`).join("")}</tbody></table>`, document.querySelectorAll(".mapping-select").forEach(e => e.addEventListener("input", () => this.validateStep4()))) : e.innerHTML = '<p style="color: white;">No placeholders found in the prompt.</p>', this.validateStep4() },
+                validateStep4() { const nextBtn = document.getElementById('cj_next_4'); let allMapped = Array.from(document.querySelectorAll('.mapping-select')).every(sel => sel.value); allMapped ? hideError('mappingError') : showError('mappingError', 'Please map all placeholders.'); let isJsonValid = true; const jsonValue = document.getElementById('outputJson').value.trim(); if (jsonValue) { try { JSON.parse(jsonValue); hideError('jsonError'); } catch (e) { isJsonValid = false; showError('jsonError', 'Invalid JSON format.'); } } else { hideError('jsonError'); } nextBtn.disabled = !(allMapped && isJsonValid); return allMapped && isJsonValid; },
+                setupStep5() { this.validateStep5(); },
+                validateStep5() { /* ... (unchanged) ... */ const e = document.getElementById("cj_next_5"), t = [{ id: "endpoint", type: "url", errorId: "endpointError", msg: "Please enter a valid URL." }, { id: "apiKey", type: "text", errorId: "apiKeyError", msg: "API Key is required." }, { id: "deploymentName", type: "text", errorId: "deploymentNameError", msg: "Deployment Name is required." }, { id: "temperature", type: "range", errorId: "temperatureError", msg: "Temperature must be between 0 and 2." }], s = t.every(e => { const t = document.getElementById(e.id); let s = !1; if ("url" === e.type) try { new URL(t.value), s = !0 } catch (e) { s = !1 } else "range" === e.type ? (s = parseFloat(t.value), s = !isNaN(s) && s >= 0 && s <= 2) : s = t.value.trim().length > 0; return s ? hideError(e.errorId) : showError(e.errorId, e.msg), s }); return e.disabled = !s, s },
+                setupStep6() { document.getElementById('summaryContainer').innerHTML = `<p><strong>Job Title:</strong> ${createJobState.jobTitle}</p><p><strong>File Name:</strong> ${createJobState.file.name}</p><p><strong>Total Rows:</strong> ${createJobState.totalRows.toLocaleString()}</p><p><strong>Chunk Size:</strong> ${createJobState.config.chunkSize}</p>`; document.getElementById('processingResult').classList.add('hidden'); document.getElementById('overviewButtons').classList.remove('hidden'); },
+                async submitJob() { /* ... (unchanged) ... */ if (createJobState.isProcessing) return; createJobState.isProcessing = !0; const e = document.getElementById("overviewButtons"), t = document.getElementById("processingResult"); e.classList.add("hidden"), t.classList.remove("hidden"), t.innerHTML = '<div class="loading"><div class="spinner"></div><p>Uploading file and creating job...</p></div>'; const s = { job_title: createJobState.jobTitle, prompt: createJobState.prompt, placeholder_field: createJobState.mappings, unique_id_field: createJobState.uniqueIdField, output_field: createJobState.outputJson, config: createJobState.config, credentials: createJobState.credentials }, a = new FormData; a.append("file", createJobState.file), a.append("description", JSON.stringify(s)); const r = new URL(CREATE_UPLOAD_ENDPOINT); r.searchParams.append("user_id", currentUser.user_id), r.searchParams.append("access_token", currentUser.access_token); try { const e = await fetch(r.toString(), { method: "POST", body: a }), s = await e.json(); if (!e.ok) throw new Error(s.detail || `API Error (${e.status})`); showToast(s.message || "Job created successfully", "success"), displayJobCreationResult(s) } catch (s) { console.error("API Call Failed:", s), t.innerHTML = `<p style="color: #ffcdd2;">Error: ${s.message}</p>`, e.classList.remove("hidden") } finally { createJobState.isProcessing = !1 } },
+                init() { /* ... (unchanged) ... */ document.getElementById("cj_next_1").addEventListener("click", () => { this.validateStep1() && (createJobState.jobTitle = document.getElementById("jobTitle").value, Object.assign(createJobState, { columns: [], previewData: [], totalRows: 0, prompt: null, placeholders: [], mappings: {}, uniqueIdField: null, outputJson: null }), this.goToStep(2)) }), document.getElementById("cj_prev_2").addEventListener("click", () => this.goToStep(1)), document.getElementById("cj_next_2").addEventListener("click", () => this.goToStep(3)), document.getElementById("cj_prev_3").addEventListener("click", () => this.goToStep(2)), document.getElementById("cj_next_3").addEventListener("click", () => { this.validateStep3() && (createJobState.prompt = document.getElementById("prompt").value, createJobState.placeholders = [...new Set(Array.from(createJobState.prompt.matchAll(/{{\s*(\w+)\s*}}/g), e => e[1]))], this.goToStep(4)) }), document.getElementById("cj_prev_4").addEventListener("click", () => this.goToStep(3)), document.getElementById("cj_next_4").addEventListener("click", () => { if (this.validateStep4()) { createJobState.mappings = {}, document.querySelectorAll(".mapping-select").forEach(e => { createJobState.mappings[e.dataset.placeholder] = e.value }), createJobState.uniqueIdField = document.getElementById("uniqueId").value || null; const e = document.getElementById("outputJson").value.trim(); createJobState.outputJson = e ? JSON.parse(e) : null, createJobState.config.chunkSize = parseInt(document.getElementById("chunkSizeInput").value), this.goToStep(5) } }), document.getElementById("cj_prev_5").addEventListener("click", () => this.goToStep(4)), document.getElementById("cj_next_5").addEventListener("click", () => { this.validateStep5() && (createJobState.credentials.endpoint = document.getElementById("endpoint").value, createJobState.credentials.apiKey = document.getElementById("apiKey").value, createJobState.credentials.deploymentName = document.getElementById("deploymentName").value, createJobState.credentials.temperature = parseFloat(document.getElementById("temperature").value), this.goToStep(6)) }), document.getElementById("cj_prev_6").addEventListener("click", () => { this.isProcessing = !1, this.goToStep(5) }), document.getElementById("submitJobBtn").addEventListener("click", () => this.submitJob()); const e = document.getElementById("fileInput"), t = document.getElementById("fileUploadArea"), s = e => { e.length > 0 && (createJobState.file = e[0], document.getElementById("fileInfo").innerHTML = `<strong>File:</strong> ${createJobState.file.name} | <strong>Size:</strong> ${formatFileSize(createJobState.file.size)}`, document.getElementById("fileInfo").classList.remove("hidden"), this.validateStep1()) }; t.addEventListener("click", () => e.click()), t.addEventListener("dragover", e => { e.preventDefault(), t.classList.add("drag-over") }), t.addEventListener("dragleave", () => t.classList.remove("drag-over")), t.addEventListener("drop", e => { e.preventDefault(), t.classList.remove("drag-over"), s(e.dataTransfer.files) }), e.addEventListener("change", e => s(e.target.files)), document.getElementById("jobTitle").addEventListener("input", () => this.validateStep1()), document.getElementById("prompt").addEventListener("input", () => this.validateStep3()), document.getElementById("outputJson").addEventListener("input", () => this.validateStep4()), document.getElementById("chunkSize").addEventListener("input", e => { document.getElementById("chunkSizeInput").value = e.target.value, this.validateStep4() }), document.getElementById("chunkSizeInput").addEventListener("input", e => { document.getElementById("chunkSize").value = e.target.value, this.validateStep4() }), ["endpoint", "apiKey", "deploymentName", "temperature"].forEach(e => document.getElementById(e).addEventListener("input", () => this.validateStep5())), this.setupStep1() }
+            };
+            const displayJobCreationResult = e => { jobCreationResultState = e; const t = document.getElementById("jobCreationResult"), s = document.getElementById("createJobFormContainer"), a = `<div class="result-summary-grid"><div class="summary-card"><div class="summary-card-title">Job Title</div><div class="summary-card-value">${e.job_title}</div></div><div class="summary-card"><div class="summary-card-title">Rows Processed</div><div class="summary-card-value">${e.total_test_rows_processed}</div></div><div class="summary-card"><div class="summary-card-title">Chunks Created</div><div class="summary-card-value">${e.chunks}</div></div></div>`; let r = "<h3>Data Preview</h3>"; e.row_preview_data && e.row_preview_data.length > 0 ? r += `<div class="data-table-container"><table class="data-table"><thead><tr>${Object.keys(e.row_preview_data[0]).map(e => `<th>${e.replace(/_/g, " ")}</th>`).join("")}</tr></thead><tbody>${e.row_preview_data.map(e => `<tr>${Object.keys(e).map(t => `<td>${JSON.stringify(e[t])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : r += "<p>No preview data available.</p>", t.innerHTML = `<h2 class="section-title">File Uploaded Successfully</h2>${a}${r}<div style="text-align:center; margin: 2rem 0;"><button class="btn btn-secondary" id="downloadInputCsvBtn">Download Input CSV File</button></div><p style="text-align:center; margin: 1rem 0;">If the preview is correct, press the button below to start the batch processing. You can also start it later from the 'Uploaded Files History' section.</p><div class="form-navigation" style="text-align: center;"><button class="btn btn-primary" id="startBatchBtn" style="font-size: 1.2rem; padding: 1rem 2rem;">Start Batch of ${e.chunks} Chunks</button></div>`, s.classList.add("hidden"), t.classList.remove("hidden"), document.getElementById("downloadInputCsvBtn").addEventListener("click", () => { downloadBase64File(jobCreationResultState.file_data, `${jobCreationResultState.job_title}_input.csv`) }), document.getElementById("startBatchBtn").addEventListener("click", startBatch) };
+            const startBatch = async () => { const e = document.getElementById("startBatchBtn"); if (!jobCreationResultState || !jobCreationResultState.job_id) return void showToast("Job ID is missing. Cannot start batch.", "error"); e.disabled = !0, e.textContent = "Starting..."; const t = new URL(START_BATCH_ENDPOINT); t.searchParams.append("user_id", currentUser.user_id), t.searchParams.append("access_token", currentUser.access_token), t.searchParams.append("job_id", jobCreationResultState.job_id); try { const s = await fetch(t.toString(), { method: "POST" }), a = await s.json(); if (!s.ok) throw new Error(a.message || "Failed to start batch."); showToast(a.message || "Batch started successfully!", "success"), e.textContent = "Batch Started!", e.style.background = "#2e7d32" } catch (s) { showToast(s.message, "error"), e.disabled = !1, e.textContent = `Start Batch of ${jobCreationResultState.chunks} Chunks` } };
 
             // --- HISTORY TABS LOGIC ---
             const fetchParentJobsHistory = async () => {
-                historyState.isLoading = true;
-                historyState.hasFetched = true;
-                renderHistoryJobCards('uploaded-files-container', openUploadedFilesModal); // Render loading in both
+                historyState.isLoading = true; historyState.hasFetched = true;
+                renderHistoryJobCards('uploaded-files-container', openUploadedFilesModal);
                 renderHistoryJobCards('batch-jobs-container', openBatchFilesModal);
-
                 try {
                     const response = await fetch(`${FETCH_PARENT_JOBS_ENDPOINT}?${getAuthParams()}`);
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to fetch job history');
                     historyState.parentJobs = data.jobs || [];
-                } catch (error) {
-                    showToast(error.message, 'error');
-                    historyState.parentJobs = [];
-                } finally {
+                } catch (error) { showToast(error.message, 'error'); historyState.parentJobs = []; }
+                finally {
                     historyState.isLoading = false;
                     renderHistoryJobCards('uploaded-files-container', openUploadedFilesModal);
                     renderHistoryJobCards('batch-jobs-container', openBatchFilesModal);
@@ -1201,21 +1254,9 @@
 
             const renderHistoryJobCards = (containerId, clickHandler) => {
                 const container = document.getElementById(containerId);
-                if (historyState.isLoading) {
-                    container.innerHTML = `<div class="loading" style="grid-column: 1 / -1;"><div class="spinner"></div><p>Fetching Job History...</p></div>`;
-                    return;
-                }
-                if (historyState.parentJobs.length === 0) {
-                    container.innerHTML = `<div class="no-items-message"><div class="no-items-icon">📂</div><p class="no-items-text">No job history found.</p></div>`;
-                    return;
-                }
-                container.innerHTML = historyState.parentJobs.map(job => `
-                    <div class="job-card" data-job-id="${job.id}" data-job-title="${job.job_title}">
-                        <h3 class="job-card-title">${job.job_title}</h3>
-                        <p class="job-card-detail"><strong>File:</strong> ${job.file_name}</p>
-                        <p class="job-card-detail"><strong>Chunks:</strong> ${job.chunks}</p>
-                        <p class="job-card-detail"><strong>Created:</strong> ${new Date(job.created_at).toLocaleString()}</p>
-                    </div>`).join('');
+                if (historyState.isLoading) { container.innerHTML = `<div class="loading" style="grid-column: 1 / -1;"><div class="spinner"></div><p>Fetching Job History...</p></div>`; return; }
+                if (historyState.parentJobs.length === 0) { container.innerHTML = `<div class="no-items-message"><div class="no-items-icon">📂</div><p class="no-items-text">No job history found.</p></div>`; return; }
+                container.innerHTML = historyState.parentJobs.map(job => `<div class="job-card" data-job-id="${job.id}" data-job-title="${job.job_title}"><h3 class="job-card-title">${job.job_title}</h3><p class="job-card-detail"><strong>File:</strong> ${job.file_name}</p><p class="job-card-detail"><strong>Chunks:</strong> ${job.chunks}</p><p class="job-card-detail"><strong>Created:</strong> ${new Date(job.created_at).toLocaleString()}</p></div>`).join('');
                 container.querySelectorAll('.job-card').forEach(card => card.addEventListener('click', () => clickHandler(card.dataset.jobId, card.dataset.jobTitle)));
             };
 
@@ -1229,41 +1270,28 @@
                     const response = await fetch(`${FETCH_UPLOADED_FILES_ENDPOINT}?${getAuthParams()}&job_id=${jobId}`);
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to fetch files');
-                    modalBody.innerHTML = (data.jobs && data.jobs.length > 0) ? `
-                        <div class="data-table-container"><table class="data-table"><thead><tr><th>Chunk</th><th>File Status</th><th>Batch Status</th><th>Rows</th><th>Actions</th></tr></thead><tbody>
-                        ${data.jobs.map(file => `<tr>
-                            <td>${file.chunk_no.replace('_', ' ')}</td>
-                            <td><span class="status-badge ${file.file_status}">${file.file_status.replace(/_/g, ' ')}</span></td>
-                            <td><span class="status-badge ${file.batch_status}">${file.batch_status.replace(/_/g, ' ')}</span></td>
-                            <td>${file.total_rows_processed}</td>
-                            <td>
-                                <button class="btn btn-secondary btn-sm" onclick="app.startSingleBatch('${file.file_id}', '${jobId}', this)" ${file.batch_status === 'started' ? 'disabled' : ''}>Start</button>
-                                <button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${file.file_id}', '${jobId}')">Input</button>
-                                <button class="btn btn-secondary btn-sm" onclick="app.deleteUploadedFile('${file.file_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button>
-                            </td></tr>`).join('')}
+                    modalBody.innerHTML = (data.jobs && data.jobs.length > 0) ? `<div class="data-table-container"><table class="data-table"><thead><tr><th>Chunk</th><th>File Status</th><th>Batch Status</th><th>Rows</th><th>Actions</th></tr></thead><tbody>
+                        ${data.jobs.map(file => `<tr><td>${file.chunk_no.replace('_', ' ')}</td><td><span class="status-badge ${file.file_status}">${file.file_status.replace(/_/g, ' ')}</span></td><td><span class="status-badge ${file.batch_status}">${file.batch_status.replace(/_/g, ' ')}</span></td><td>${file.total_rows_processed}</td>
+                            <td><button class="btn btn-secondary btn-sm" onclick="app.startSingleBatch('${file.file_id}', '${jobId}', this)" ${file.batch_status === 'started' ? 'disabled' : ''}>Start</button><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${file.file_id}', '${jobId}')">Input</button><button class="btn btn-secondary btn-sm" onclick="app.deleteUploadedFile('${file.file_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button></td></tr>`).join('')}
                         </tbody></table></div>` : `<p class="no-items-text">No uploaded files found for this job.</p>`;
                 } catch (error) { showToast(error.message, 'error'); modalBody.innerHTML = `<p style="color: #ffcdd2; text-align: center;">${error.message}</p>`; }
             };
-
             const deleteUploadedFile = async (fileId, jobId, jobTitle) => {
                 if (!confirm(`Delete file chunk: ${fileId}?`)) return;
                 try {
                     const response = await fetch(`${DELETE_UPLOADED_FILE_ENDPOINT}?${getAuthParams()}&file_id=${fileId}`, { method: 'DELETE' });
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to delete file.');
-                    showToast(data.message, 'success');
-                    openUploadedFilesModal(jobId, jobTitle);
+                    showToast(data.message, 'success'); openUploadedFilesModal(jobId, jobTitle);
                 } catch (error) { showToast(error.message, 'error'); }
             };
-
             const startSingleBatch = async (fileId, jobId, btn) => {
                 btn.disabled = true; btn.textContent = '...';
                 try {
                     const response = await fetch(`${START_SINGLE_BATCH_ENDPOINT}?${getAuthParams()}&job_id=${jobId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file_ids: [fileId] }) });
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to start batch.');
-                    showToast(data.message, 'success');
-                    openUploadedFilesModal(jobId, document.getElementById('filesModalTitle').textContent.replace('Uploaded Files for: ', ''));
+                    showToast(data.message, 'success'); openUploadedFilesModal(jobId, document.getElementById('filesModalTitle').textContent.replace('Uploaded Files for: ', ''));
                 } catch (error) { showToast(error.message, 'error'); btn.disabled = false; btn.textContent = 'Start'; }
             };
 
@@ -1277,33 +1305,23 @@
                     const response = await fetch(`${FETCH_BATCH_FILES_ENDPOINT}?${getAuthParams()}&job_id=${jobId}`);
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to fetch batch files');
-                    modalBody.innerHTML = (data.jobs && data.jobs.length > 0) ? `
-                        <div class="data-table-container"><table class="data-table"><thead><tr><th>Chunk</th><th>Status</th><th>Rows</th><th>Actions</th></tr></thead><tbody>
-                        ${data.jobs.map(batch => `<tr>
-                            <td>${batch.chunk_no.replace('_', ' ')}</td>
-                            <td><span class="status-badge ${batch.status}">${batch.status.replace(/_/g, ' ')}</span></td>
-                            <td>${batch.total_rows_processed}</td>
-                            <td>
-                                <button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${batch.file_id}', '${jobId}')">Input</button>
-                                <button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewOutputFile('${batch.batch_id}', '${jobId}')" ${batch.status !== 'completed' ? 'disabled' : ''}>Output</button>
-                                <button class="btn btn-secondary btn-sm" onclick="app.deleteBatchFile('${batch.batch_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button>
-                            </td></tr>`).join('')}
+                    modalBody.innerHTML = (data.jobs && data.jobs.length > 0) ? `<div class="data-table-container"><table class="data-table"><thead><tr><th>Chunk</th><th>Status</th><th>Rows</th><th>Actions</th></tr></thead><tbody>
+                        ${data.jobs.map(batch => `<tr><td>${batch.chunk_no.replace('_', ' ')}</td><td><span class="status-badge ${batch.status}">${batch.status.replace(/_/g, ' ')}</span></td><td>${batch.total_rows_processed}</td>
+                            <td><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${batch.file_id}', '${jobId}')">Input</button><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewOutputFile('${batch.batch_id}', '${jobId}')" ${batch.status !== 'completed' ? 'disabled' : ''}>Output</button><button class="btn btn-secondary btn-sm" onclick="app.deleteBatchFile('${batch.batch_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button></td></tr>`).join('')}
                         </tbody></table></div>` : `<p class="no-items-text">No batches found for this job.</p>`;
                 } catch (error) { showToast(error.message, 'error'); modalBody.innerHTML = `<p style="color: #ffcdd2; text-align: center;">${error.message}</p>`; }
             };
-
             const deleteBatchFile = async (batchId, jobId, jobTitle) => {
                 if (!confirm(`Delete batch process: ${batchId}?`)) return;
                 try {
                     const response = await fetch(`${DELETE_BATCH_FILE_ENDPOINT}?${getAuthParams()}&batch_id=${batchId}`, { method: 'DELETE' });
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to delete batch.');
-                    showToast(data.message, 'success');
-                    openBatchFilesModal(jobId, jobTitle);
+                    showToast(data.message, 'success'); openBatchFilesModal(jobId, jobTitle);
                 } catch (error) { showToast(error.message, 'error'); }
             };
 
-            // --- Download & Preview Logic (Reused for both history types) ---
+            // --- Download & Preview Logic ---
             const downloadAndPreviewFile = async (fileId, jobId) => {
                 showToast('Preparing input file download...', 'info');
                 try {
@@ -1311,13 +1329,10 @@
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to get file data.');
                     const fileData = data.input_files_csv_data[0];
-                    if (fileData && fileData.file_data) {
-                        downloadBase64File(fileData.file_data, `input_${fileId}.csv`);
-                        openInputPreviewModal(fileData);
-                    } else { throw new Error('No input file data received.'); }
+                    if (fileData && fileData.file_data) { downloadBase64File(fileData.file_data, `input_${fileId}.csv`); openInputPreviewModal(fileData); }
+                    else { throw new Error('No input file data received.'); }
                 } catch (error) { showToast(error.message, 'error'); }
             };
-
             const downloadAndPreviewOutputFile = async (batchId, jobId) => {
                 showToast('Preparing output file download...', 'info');
                 try {
@@ -1325,27 +1340,22 @@
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to get file data.');
                     const fileData = data.output_files_csv_data[0];
-                    if (fileData && fileData.file_data) {
-                        downloadBase64File(fileData.file_data, `output_${batchId}.csv`);
-                        openOutputPreviewModal(fileData);
-                    } else { throw new Error('No output file data received.'); }
+                    if (fileData && fileData.file_data) { downloadBase64File(fileData.file_data, `output_${batchId}.csv`); openOutputPreviewModal(fileData); }
+                    else { throw new Error('No output file data received.'); }
                 } catch (error) { showToast(error.message, 'error'); }
             };
-
             const openInputPreviewModal = (fileData) => {
                 const modalBody = document.getElementById('downloadPreviewModalBody');
                 modalBody.innerHTML = `<h4>Preview for ${fileData.total_test_rows_processed} rows in ${fileData.file_id}</h4>
                     ${fileData.row_preview_data.map(row => `<div class="summary-card" style="text-align: left;"><p><strong>Unique ID:</strong> ${row.unique_id}</p><p><strong>Model:</strong> ${row.model_name}</p><p><strong>Prompt:</strong></p><div class="preview-content">${JSON.stringify(row.message_prompt, null, 2)}</div></div>`).join('')}`;
                 document.getElementById('downloadPreviewModal').classList.add('show');
             };
-
             const openOutputPreviewModal = (fileData) => {
                 const modalBody = document.getElementById('downloadPreviewModalBody');
                 modalBody.innerHTML = `<h4>Preview for ${fileData.total_test_rows_processed} rows in ${fileData.batch_id}</h4>
                     ${fileData.row_preview_data.map(row => `<div class="summary-card" style="text-align: left;"><p><strong>Unique ID:</strong> ${row.unique_id}</p><p><strong>Tokens:</strong> ${row.total_tokens} (P: ${row.prompt_tokens} + C: ${row.completion_tokens})</p><p><strong>Raw Output:</strong></p><div class="preview-content">${row.raw_output}</div></div>`).join('')}`;
                 document.getElementById('downloadPreviewModal').classList.add('show');
             };
-
 
             // --- INITIALIZATION ---
             document.getElementById('loginForm').addEventListener('submit', (e) => { e.preventDefault(); login(document.getElementById('email').value, document.getElementById('password').value); });
@@ -1355,9 +1365,7 @@
             document.querySelectorAll('.nav-item').forEach(item => item.addEventListener('click', (e) => { e.preventDefault(); switchSection(item.dataset.section); }));
             window.addEventListener('popstate', handleRouting);
             document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => document.getElementById(btn.dataset.modalId).classList.remove('show')));
-
             window.app = { deleteUploadedFile, startSingleBatch, downloadAndPreviewFile, deleteBatchFile, downloadAndPreviewOutputFile };
-
             checkSession();
             createJobManager.init();
         });
