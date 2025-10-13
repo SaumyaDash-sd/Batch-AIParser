@@ -178,6 +178,24 @@ def get_uploaded_files_by_job_id(user_id: str, job_id: str):
     }
 
 
+def check_batch_progress(client, batch_id):
+    try:
+        # Monitor the batch status
+        status = "validating"
+        batch_response = client.batches.retrieve(batch_id)  # Fetch updated batch info
+        status = batch_response.status
+
+        if batch_response.status == "failed":
+            return {"status": "failed", "output_file_id": None, "error": None}
+        if batch_response.status == "completed":
+            output_file_id = batch_response.output_file_id
+            return {"status": "completed", "output_file_id": output_file_id, "error": None}
+
+        return {"status": status, "output_file_id": None, "error": None}
+    except Exception as err:
+        return {"status": "invalid-batch-id", "output_file_id": None, "error": err}
+
+
 def get_batch_files_by_job_id(user_id: str, job_id: str):
     df = read_batch_files()
 
@@ -195,14 +213,26 @@ def get_batch_files_by_job_id(user_id: str, job_id: str):
         }
 
     # Convert each job row into dict
+    final_batch_job_data = []
     jobs_list = clean_nans(user_jobs.to_dict(orient="records"))
+    if jobs_list:
+        # get openai client to get job creds
+        client = get_openai_client(user_id, job_id)
+        for batch_job in jobs_list:
+            if batch_job["status"] != "completed": #type: ignore
+                current_batch_status = check_batch_progress(client, batch_job["batch_id"]) #type: ignore
+                batch_job["status"] = current_batch_status["status"] #type: ignore
+                batch_job["output_file_id"] = current_batch_status["output_file_id"] #type: ignore
+                final_batch_job_data.append(batch_job)
+            else:
+                final_batch_job_data.append(batch_job)
 
     return {
         "status_code": 200,
         "user_id": user_id,
         "job_id": job_id,
-        "jobs": jobs_list,
-        "total_jobs": len(jobs_list) if isinstance(jobs_list, list) else 0,
+        "jobs": final_batch_job_data,
+        "total_jobs": len(final_batch_job_data) if isinstance(final_batch_job_data, list) else 0,
         "message": "Batch files fetched successfully",
     }
 
@@ -429,7 +459,7 @@ def update_batch_status_if_changed(user_id, job_id, batch_id, latest_status, out
     
     # Step 3: Check if row exists
     if not df[mask].empty:
-        current_status = df.loc[mask, "status"].iloc[0]
+        current_status = df.loc[mask, "status"].iloc[0] #type: ignore
         
         # Step 4: Update only if status is different
         if current_status != latest_status:
