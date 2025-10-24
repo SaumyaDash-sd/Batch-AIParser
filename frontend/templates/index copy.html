@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF--8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batch Processor Pro</title>
+    <title>BatchProcessor Pro</title>
     <link rel="icon" type="image/x-icon" href="https://www.justdial.com/favicon.ico">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -238,10 +238,7 @@
 
         .nav-menu {
             display: flex;
-            align-items: center;
-            /* Ensures vertical alignment */
-            gap: 1.5rem;
-            /* Adjusted gap for new button */
+            gap: 2rem;
         }
 
         .nav-item {
@@ -258,22 +255,6 @@
             background: rgba(255, 255, 255, 0.2);
             color: white;
         }
-
-        /* --- NEW BUTTON STYLE --- */
-        .nav-btn-gradient {
-            background: linear-gradient(45deg, #ff8b26, #348fff);
-            color: white !important;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .nav-btn-gradient:hover {
-            background: linear-gradient(45deg, #348fff, #ff8b26) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        /* --- END NEW BUTTON STYLE --- */
 
         .profile-menu {
             position: relative;
@@ -928,7 +909,7 @@
                 <div class="logo-container"><img
                         src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
                         alt="Logo" class="logo">
-                    <h1 class="login-title">Batch Processor Pro</h1>
+                    <h1 class="login-title">BatchProcessor Pro</h1>
                     <p class="login-subtitle">Advanced Batch Processing Platform</p>
                 </div>
                 <form id="loginForm">
@@ -948,14 +929,10 @@
             <nav class="navbar">
                 <div class="nav-logo"><img
                         src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyZJ-7dYiVbRKZIQMirchNjfri3xFyHMtRzw&s"
-                        alt="Logo" class="nav-logo-icon"> Batch Processor Pro</div>
-                <div class="nav-menu">
-                    <a href="#" class="nav-item active" data-section="create-job">Create Job</a>
-                    <a href="#" class="nav-item" data-section="uploaded-files-history">Uploaded Files History</a>
-                    <a href="#" class="nav-item" data-section="batch-jobs-history">Batch Jobs History</a>
-                    <a href="http://127.0.0.1:8000/test-process#/test-process" target="_blank"
-                        class="nav-item nav-btn-gradient">Test Processor</a>
-                </div>
+                        alt="Logo" class="nav-logo-icon"> BatchProcessor Pro</div>
+                <div class="nav-menu"><a href="#" class="nav-item active" data-section="create-job">Create Job</a><a
+                        href="#" class="nav-item" data-section="uploaded-files-history">Uploaded Files History</a><a
+                        href="#" class="nav-item" data-section="batch-jobs-history">Batch Jobs History</a></div>
                 <div class="profile-menu"><button class="profile-btn" id="profileBtn"><span
                             id="profileInitial">U</span></button>
                     <div class="profile-dropdown" id="profileDropdown">
@@ -1294,9 +1271,9 @@
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to fetch files');
                     modalBody.innerHTML = (data.jobs && data.jobs.length > 0) ? `<div class="data-table-container"><table class="data-table"><thead><tr><th>Chunk</th><th>File Status</th><th>Batch Status</th><th>Rows</th><th>Actions</th></tr></thead><tbody>
-                                ${data.jobs.map(file => `<tr><td>${file.chunk_no.replace('_', ' ')}</td><td><span class="status-badge ${file.file_status}">${file.file_status.replace(/_/g, ' ')}</span></td><td><span class="status-badge ${file.batch_status}">${file.batch_status.replace(/_/g, ' ')}</span></td><td>${file.total_rows_processed}</td>
-                                    <td><button class="btn btn-secondary btn-sm" onclick="app.startSingleBatch('${file.file_id}', '${jobId}', this)" ${file.batch_status === 'started' ? 'disabled' : ''}>Start</button><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${file.file_id}', '${jobId}')">Input</button><button class="btn btn-secondary btn-sm" onclick="app.deleteUploadedFile('${file.file_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button></td></tr>`).join('')}
-                                </tbody></table></div>` : `<p class="no-items-text">No uploaded files found for this job.</p>`;
+                        ${data.jobs.map(file => `<tr><td>${file.chunk_no.replace('_', ' ')}</td><td><span class="status-badge ${file.file_status}">${file.file_status.replace(/_/g, ' ')}</span></td><td><span class="status-badge ${file.batch_status}">${file.batch_status.replace(/_/g, ' ')}</span></td><td>${file.total_rows_processed}</td>
+                            <td><button class="btn btn-secondary btn-sm" onclick="app.startSingleBatch('${file.file_id}', '${jobId}', this)" ${file.batch_status === 'started' ? 'disabled' : ''}>Start</button><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${file.file_id}', '${jobId}')">Input</button><button class="btn btn-secondary btn-sm" onclick="app.deleteUploadedFile('${file.file_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button></td></tr>`).join('')}
+                        </tbody></table></div>` : `<p class="no-items-text">No uploaded files found for this job.</p>`;
                 } catch (error) { showToast(error.message, 'error'); modalBody.innerHTML = `<p style="color: #ffcdd2; text-align: center;">${error.message}</p>`; }
             };
             const deleteUploadedFile = async (fileId, jobId, jobTitle) => {
@@ -1329,9 +1306,9 @@
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.message || 'Failed to fetch batch files');
                     modalBody.innerHTML = (data.jobs && data.jobs.length > 0) ? `<div class="data-table-container"><table class="data-table"><thead><tr><th>Chunk</th><th>Status</th><th>Rows</th><th>Actions</th></tr></thead><tbody>
-                                ${data.jobs.map(batch => `<tr><td>${batch.chunk_no.replace('_', ' ')}</td><td><span class="status-badge ${batch.status}">${batch.status.replace(/_/g, ' ')}</span></td><td>${batch.total_rows_processed}</td>
-                                    <td><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${batch.file_id}', '${jobId}')">Input</button><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewOutputFile('${batch.batch_id}', '${jobId}')" ${batch.status !== 'completed' ? 'disabled' : ''}>Output</button><button class="btn btn-secondary btn-sm" onclick="app.deleteBatchFile('${batch.batch_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button></td></tr>`).join('')}
-                                </tbody></table></div>` : `<p class="no-items-text">No batches found for this job.</p>`;
+                        ${data.jobs.map(batch => `<tr><td>${batch.chunk_no.replace('_', ' ')}</td><td><span class="status-badge ${batch.status}">${batch.status.replace(/_/g, ' ')}</span></td><td>${batch.total_rows_processed}</td>
+                            <td><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewFile('${batch.file_id}', '${jobId}')">Input</button><button class="btn btn-secondary btn-sm" onclick="app.downloadAndPreviewOutputFile('${batch.batch_id}', '${jobId}')" ${batch.status !== 'completed' ? 'disabled' : ''}>Output</button><button class="btn btn-secondary btn-sm" onclick="app.deleteBatchFile('${batch.batch_id}', '${jobId}', '${jobTitle}')" style="background: #c62828;">Del</button></td></tr>`).join('')}
+                        </tbody></table></div>` : `<p class="no-items-text">No batches found for this job.</p>`;
                 } catch (error) { showToast(error.message, 'error'); modalBody.innerHTML = `<p style="color: #ffcdd2; text-align: center;">${error.message}</p>`; }
             };
             const deleteBatchFile = async (batchId, jobId, jobTitle) => {
@@ -1370,13 +1347,13 @@
             const openInputPreviewModal = (fileData) => {
                 const modalBody = document.getElementById('downloadPreviewModalBody');
                 modalBody.innerHTML = `<h4>Preview for ${fileData.total_test_rows_processed} rows in ${fileData.file_id}</h4>
-                                ${fileData.row_preview_data.map(row => `<div class="summary-card" style="text-align: left;"><p><strong>Unique ID:</strong> ${row.unique_id}</p><p><strong>Model:</strong> ${row.model_name}</p><p><strong>Prompt:</strong></p><div class="preview-content">${JSON.stringify(row.message_prompt, null, 2)}</div></div>`).join('')}`;
+                    ${fileData.row_preview_data.map(row => `<div class="summary-card" style="text-align: left;"><p><strong>Unique ID:</strong> ${row.unique_id}</p><p><strong>Model:</strong> ${row.model_name}</p><p><strong>Prompt:</strong></p><div class="preview-content">${JSON.stringify(row.message_prompt, null, 2)}</div></div>`).join('')}`;
                 document.getElementById('downloadPreviewModal').classList.add('show');
             };
             const openOutputPreviewModal = (fileData) => {
                 const modalBody = document.getElementById('downloadPreviewModalBody');
                 modalBody.innerHTML = `<h4>Preview for ${fileData.total_test_rows_processed} rows in ${fileData.batch_id}</h4>
-                                ${fileData.row_preview_data.map(row => `<div class="summary-card" style="text-align: left;"><p><strong>Unique ID:</strong> ${row.unique_id}</p><p><strong>Tokens:</strong> ${row.total_tokens} (P: ${row.prompt_tokens} + C: ${row.completion_tokens})</p><p><strong>Raw Output:</strong></p><div class="preview-content">${row.raw_output}</div></div>`).join('')}`;
+                    ${fileData.row_preview_data.map(row => `<div class="summary-card" style="text-align: left;"><p><strong>Unique ID:</strong> ${row.unique_id}</p><p><strong>Tokens:</strong> ${row.total_tokens} (P: ${row.prompt_tokens} + C: ${row.completion_tokens})</p><p><strong>Raw Output:</strong></p><div class="preview-content">${row.raw_output}</div></div>`).join('')}`;
                 document.getElementById('downloadPreviewModal').classList.add('show');
             };
 
@@ -1385,14 +1362,7 @@
             document.getElementById('profileBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('profileDropdown').classList.toggle('show'); });
             document.addEventListener('click', (e) => { if (!document.querySelector('.profile-menu').contains(e.target)) document.getElementById('profileDropdown').classList.remove('show'); });
             document.getElementById('logoutBtn').addEventListener('click', () => logout('You have been logged out.'));
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (item.dataset.section) { // Only add click listener to internal nav items
-                    item.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        switchSection(item.dataset.section);
-                    });
-                }
-            });
+            document.querySelectorAll('.nav-item').forEach(item => item.addEventListener('click', (e) => { e.preventDefault(); switchSection(item.dataset.section); }));
             window.addEventListener('popstate', handleRouting);
             document.querySelectorAll('.modal-close-btn').forEach(btn => btn.addEventListener('click', () => document.getElementById(btn.dataset.modalId).classList.remove('show')));
             window.app = { deleteUploadedFile, startSingleBatch, downloadAndPreviewFile, deleteBatchFile, downloadAndPreviewOutputFile };
