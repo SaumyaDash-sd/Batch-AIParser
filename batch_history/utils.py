@@ -9,7 +9,7 @@ from database.mysql_connection import ConnectDB
 UPLOADED_FILES_TABLE = "uploaded_files_AI_Portal"
 BATCH_FILES_TABLE = "batch_files_AI_Portal"
 BATCH_JOBS_TABLE = "batch_jobs_AI_Portal"
-DB_NAME = "team_keywords"
+DB_NAME = os.getenv("DB_DATABASE")
 
 
 def read_uploaded_files():
