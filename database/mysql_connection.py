@@ -146,12 +146,12 @@ class ConnectDB:
 
 
 
-# SELECT * FROM GOJD.users_AI_Portal;
-# SELECT * FROM GOJD.batch_history_AI_Portal;
-# SELECT * FROM GOJD.job_history_AI_Portal;
-# SELECT * FROM GOJD.batch_files_AI_Portal;
-# SELECT * FROM GOJD.batch_jobs_AI_Portal;
-# SELECT * FROM GOJD.uploaded_files_AI_Portal;
+# SELECT * FROM team_keywords.users_AI_Portal;
+# SELECT * FROM team_keywords.batch_history_AI_Portal;
+# SELECT * FROM team_keywords.job_history_AI_Portal;
+# SELECT * FROM team_keywords.batch_files_AI_Portal;
+# SELECT * FROM team_keywords.batch_jobs_AI_Portal;
+# SELECT * FROM team_keywords.uploaded_files_AI_Portal;
 
 
 # from database.mysql_connection import ConnectDB
@@ -159,7 +159,7 @@ class ConnectDB:
 # connection = ConnectDB()
 
 # # result = connection.execute("Any Alter MySQL Query")
-# result = connection.fetch("SELECT * FROM GOJD.users_AI_Portal;")
+# result = connection.fetch("SELECT * FROM team_keywords.users_AI_Portal;")
 # print('result :', result)
 # print('DataFrame :', pd.DataFrame(result["data"]))
 
