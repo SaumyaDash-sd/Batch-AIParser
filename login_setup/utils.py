@@ -6,7 +6,7 @@ from database.mysql_connection import ConnectDB
 
 # MySQL table name
 USERS_TABLE = "users_AI_Portal"
-DB_NAME = "GOJD"
+DB_NAME = os.getenv("DB_DATABASE")
 
 
 def read_users():

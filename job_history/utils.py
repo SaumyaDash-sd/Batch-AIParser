@@ -7,7 +7,7 @@ from database.mysql_connection import ConnectDB
 
 # MySQL table name
 JOBS_TABLE = "job_history_AI_Portal"
-DB_NAME = "GOJD"
+DB_NAME = os.getenv("DB_DATABASE")
 
 
 def read_jobs():
