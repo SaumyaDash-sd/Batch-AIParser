@@ -11,21 +11,43 @@ from openai import AzureOpenAI
 from datetime import datetime
 
 
-def split_dataframe_into_chunks(dataframe, chunk_size):
-    """
-    Splits a DataFrame into smaller DataFrames of a given chunk size.
+# def split_dataframe_into_chunks(dataframe, chunk_size):
+#     """
+#     Splits a DataFrame into smaller DataFrames of a given chunk size.
 
-    Parameters:
-        dataframe (pd.DataFrame): Input DataFrame.
-        chunk_size (int): Number of rows per chunk.
+#     Parameters:
+#         dataframe (pd.DataFrame): Input DataFrame.
+#         chunk_size (int): Number of rows per chunk.
 
-    Returns:
-        List[pd.DataFrame]: List of DataFrames, each of size chunk_size (last chunk may be smaller).
+#     Returns:
+#         List[pd.DataFrame]: List of DataFrames, each of size chunk_size (last chunk may be smaller).
+#     """
+#     chunks = [
+#         dataframe.iloc[i : i + chunk_size] for i in range(0, len(dataframe), chunk_size)
+#     ]
+#     return chunks
+
+def split_dataframe_into_chunks(dataframe, number_of_chunks):
     """
-    chunks = [
-        dataframe.iloc[i : i + chunk_size] for i in range(0, len(dataframe), chunk_size)
-    ]
+    Split dataframe into a fixed number of chunks.
+    Each chunk will have roughly len(df) / number_of_chunks rows.
+    """
+    total_rows = len(dataframe)
+    rows_per_chunk = total_rows // number_of_chunks
+    chunks = []
+    
+    start = 0
+    for i in range(number_of_chunks):
+        # Last chunk takes all remaining rows
+        if i == number_of_chunks - 1:
+            chunks.append(dataframe.iloc[start : ])
+        else:
+            end = start + rows_per_chunk
+            chunks.append(dataframe.iloc[start : end])
+            start = end
+    
     return chunks
+
 
 
 def upload_dataframe_as_jsonl(
