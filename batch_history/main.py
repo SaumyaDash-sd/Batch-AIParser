@@ -460,5 +460,5 @@ def update_batch_status_if_changed(user_id, job_id, batch_id, latest_status, out
             if latest_status == "completed" and output_file_id is not None:
                 df.loc[mask, "output_file_id"] = output_file_id
             
-            # Step 5: Write back to CSV
+            # Step5: Write back to CSV
             write_batch_files(df)
